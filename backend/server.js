@@ -17,7 +17,8 @@ const getGpuUsage = () => {
         return;
       }
       const gpuUsages = stdout.trim().split('\n').map(Number);
-      resolve(gpuUsages);
+      const totalGpuUsage = gpuUsages.reduce((acc, usage) => acc + usage, 0) / gpuUsages.length;
+      resolve(totalGpuUsage);
     });
   });
 };
@@ -27,21 +28,31 @@ app.get('/api/system', async (req, res) => {
     const data = await si.processes();
     const cpu = await si.currentLoad();
     const memory = await si.mem();
-    const gpuUsages = await getGpuUsage();
+    const gpuUsage = await getGpuUsage();
 
     const processes = data.list
-      .filter(process => process.name !== 'System Idle Process') // Filter out System Idle Process
+      .filter(process => process.name !== 'System Idle Process')
       .map((process, index) => ({
         ...process,
-        gpu: gpuUsages ? gpuUsages[index % gpuUsages.length] : 'N/A', // Use real GPU data if available, otherwise 'N/A'
+        gpu: gpuUsage !== null ? gpuUsage : 'N/A', // Use real GPU data if available, otherwise 'N/A'
         mem: process.memRss // Memory usage in bytes
       }));
 
     const totalCpuUsage = cpu.currentLoad.toFixed(2);
-    const totalGpuUsage = gpuUsages ? (gpuUsages.reduce((acc, usage) => acc + usage, 0) / gpuUsages.length).toFixed(2) : 'N/A';
+    const totalGpuUsage = gpuUsage !== null ? gpuUsage.toFixed(2) : 'N/A';
     const totalMemUsage = ((memory.used / memory.total) * 100).toFixed(2);
 
-    res.json({ processes, totalCpuUsage, totalGpuUsage, totalMemUsage });
+    res.json({
+      processes,
+      totalCpuUsage,
+      totalGpuUsage,
+      totalMemUsage,
+      memory: {
+        total: memory.total,
+        used: memory.used,
+        free: memory.total - memory.used,
+      }
+    });
   } catch (error) {
     res.status(500).send(error.toString());
   }
