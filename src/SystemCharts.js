@@ -53,12 +53,40 @@ const SystemCharts = () => {
     };
   };
 
+  const options = {
+    plugins: {
+      tooltip: {
+        enabled: true
+      },
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      x: {
+        display: false
+      },
+      y: {
+        display: false
+      }
+    }
+  };
+
   return (
     <div>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <Bar data={getChartData('cpu')} ref={el => chartRefs.current[0] = el?.chartInstance} />
-        <Bar data={getChartData('gpu')} ref={el => chartRefs.current[1] = el?.chartInstance} />
-        <Bar data={getChartData('mem')} ref={el => chartRefs.current[2] = el?.chartInstance} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} id='bars'>
+        <div>
+          <h3 style={{ fontSize: '20px', textAlign: 'center' }}>CPU Usage</h3>
+          <Bar data={getChartData('cpu')} options={options} ref={el => chartRefs.current[0] = el?.chartInstance} />
+        </div>
+        <div>
+          <h3 style={{ fontSize: '20px', textAlign: 'center' }}>Memory Usage</h3>
+          <Bar data={getChartData('mem')} options={options} ref={el => chartRefs.current[2] = el?.chartInstance} />
+        </div>
+         <div>
+          <h3 style={{ fontSize: '20px', textAlign: 'center' }}>GPU Usage</h3>
+          <Bar data={getChartData('gpu')} options={options} ref={el => chartRefs.current[1] = el?.chartInstance} />
+        </div>
       </div>
     </div>
   );

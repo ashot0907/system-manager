@@ -56,12 +56,12 @@ const TotalUsageDonuts = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px' }}>
-      <div>
+    <div style={{ marginTop: '20px' }} id='donutes'>
+      <div style={{ marginBottom: '20px' }}>
         <h3>CPU Usage</h3>
         <Doughnut data={cpuData} />
       </div>
-      <div>
+      <div style={{ marginBottom: '20px' }}>
         <h3>GPU Usage</h3>
         <Doughnut data={gpuData} />
       </div>

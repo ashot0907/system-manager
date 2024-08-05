@@ -34,7 +34,7 @@ const AppTable = () => {
   };
 
   return (
-    <Paper>
+    <Paper id='table'>
       <TableContainer>
         <Table>
           <TableHead>
