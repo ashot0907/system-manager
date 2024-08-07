@@ -10,14 +10,18 @@ app.use(cors());
 
 const getGpuInfo = () => {
   return new Promise((resolve, reject) => {
-    exec('nvidia-smi --query-gpu=name --format=csv,noheader,nounits', (error, stdout, stderr) => {
+    exec('nvidia-smi --query-gpu=name,utilization.gpu --format=csv,noheader,nounits', (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
-        resolve('N/A'); // No GPU found or command failed
+        resolve([{ model: 'N/A', usage: 0 }]); // No GPU found or command failed
         return;
       }
-      const gpuModel = stdout.trim();
-      resolve(gpuModel);
+      const lines = stdout.trim().split('\n');
+      const gpuData = lines.map(line => {
+        const [model, usage] = line.split(',').map(item => item.trim());
+        return { model, usage: Number(usage) };
+      });
+      resolve(gpuData);
     });
   });
 };
@@ -25,8 +29,8 @@ const getGpuInfo = () => {
 app.get('/api/system', async (req, res) => {
   try {
     const cpuData = await si.cpu();
-    const gpuModel = await getGpuInfo();
-    const data = await si.processes();
+    const gpuData = await getGpuInfo();
+    const processesData = await si.processes();
     const cpu = await si.currentLoad();
     const memory = await si.mem();
     const fsSizes = await si.fsSize();
@@ -38,11 +42,11 @@ app.get('/api/system', async (req, res) => {
     }));
 
     // Sort and limit processes to top 10 by CPU core usage
-    const processes = data.list
+    const processes = processesData.list
       .filter((process) => process.name !== 'System Idle Process')
       .map((process) => ({
         ...process,
-        gpu: gpuModel !== 'N/A' ? gpuModel : 'N/A', // Use real GPU data if available, otherwise 'N/A'
+        gpu: gpuData[0].usage, // Assume one GPU for simplicity
         mem: process.memRss, // Memory usage in bytes
         cpuCores: process.cpu, // CPU cores used by the process
       }))
@@ -50,7 +54,7 @@ app.get('/api/system', async (req, res) => {
       .slice(0, 10); // Limit to top 10
 
     const totalCpuUsage = cpu.currentLoad.toFixed(2);
-    const totalGpuUsage = gpuModel !== 'N/A' ? gpuModel : 'N/A';
+    const totalGpuUsage = gpuData.reduce((acc, gpu) => acc + gpu.usage, 0) / gpuData.length;
     const totalMemUsage = ((memory.used / memory.total) * 100).toFixed(2);
 
     // Aggregate disk information
@@ -63,10 +67,10 @@ app.get('/api/system', async (req, res) => {
 
     res.json({
       cpuModel: cpuData.manufacturer + ' ' + cpuData.brand,
-      gpuModel,
+      gpuModel: gpuData[0].model, // Assume one GPU for simplicity
       processes,
       totalCpuUsage,
-      totalGpuUsage,
+      totalGpuUsage: totalGpuUsage.toFixed(2),
       totalMemUsage,
       memory: {
         total: memory.total,
@@ -77,6 +81,7 @@ app.get('/api/system', async (req, res) => {
       cpuCores,
     });
   } catch (error) {
+    console.error('Error fetching system data:', error);
     res.status(500).send(error.toString());
   }
 });

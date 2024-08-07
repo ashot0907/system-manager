@@ -34,7 +34,7 @@ const AppTable = () => {
   };
 
   return (
-    <Paper id='table'>
+    <Paper>
       <TableContainer>
         <Table>
           <TableHead>
@@ -50,7 +50,7 @@ const AppTable = () => {
               <TableRow key={task.pid}>
                 <TableCell>{task.name}</TableCell>
                 <TableCell align="right">{task.cpu.toFixed(2)}</TableCell>
-                <TableCell align="right">{task.gpu !== 'N/A' ? task.gpu.toFixed(2) : 'N/A'}</TableCell>
+                <TableCell align="right">{typeof task.gpu === 'number' ? task.gpu.toFixed(2) : task.gpu}</TableCell>
                 <TableCell align="right">{(task.mem / 1024 / 1024).toFixed(2)}</TableCell>
               </TableRow>
             ))}
