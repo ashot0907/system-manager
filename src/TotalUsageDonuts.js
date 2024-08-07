@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   ArcElement,
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -56,16 +56,16 @@ const TotalUsageDonuts = () => {
   };
 
   return (
-    <div style={{ marginTop: '20px' }} id='donutes'>
-      <div style={{ marginBottom: '20px' }}>
+    <div id="donuts">
+      <div className="doughnut-chart">
         <h3>CPU Usage</h3>
         <Doughnut data={cpuData} />
       </div>
-      <div style={{ marginBottom: '20px' }}>
+      <div className="doughnut-chart">
         <h3>GPU Usage</h3>
         <Doughnut data={gpuData} />
       </div>
-      <div>
+      <div className="doughnut-chart">
         <h3>Memory Usage</h3>
         <Doughnut data={memoryData} />
       </div>

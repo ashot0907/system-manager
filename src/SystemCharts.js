@@ -73,19 +73,19 @@ const SystemCharts = () => {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} id='bars'>
+    <div className="chart-container">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div>
-          <h3 style={{ fontSize: '20px', textAlign: 'center' }}>CPU Usage</h3>
+          <h3>CPU Usage</h3>
           <Bar data={getChartData('cpu')} options={options} ref={el => chartRefs.current[0] = el?.chartInstance} />
         </div>
         <div>
-          <h3 style={{ fontSize: '20px', textAlign: 'center' }}>Memory Usage</h3>
-          <Bar data={getChartData('mem')} options={options} ref={el => chartRefs.current[2] = el?.chartInstance} />
+          <h3>Memory Usage</h3>
+          <Bar data={getChartData('mem')} options={options} ref={el => chartRefs.current[1] = el?.chartInstance} />
         </div>
-         <div>
-          <h3 style={{ fontSize: '20px', textAlign: 'center' }}>GPU Usage</h3>
-          <Bar data={getChartData('gpu')} options={options} ref={el => chartRefs.current[1] = el?.chartInstance} />
+        <div>
+          <h3>GPU Usage</h3>
+          <Bar data={getChartData('gpu')} options={options} ref={el => chartRefs.current[2] = el?.chartInstance} />
         </div>
       </div>
     </div>

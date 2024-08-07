@@ -1,42 +1,55 @@
-#main{
+/* App.css */
+
+body {
+    background-color: #1e1e2f;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  #main {
+    padding: 20px;
+  }
+  
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  
+  .card {
+    background-color: #2a2a3b;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card h3 {
+    margin: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  
+  .chart-container {
+    height: 300px;
+  }
+  
+  .doughnut-chart {
+    height: 250px;
+  }
+  
+  #donuts {
+    padding: 10px;
     display: flex;
-    gap: 25px;
-}
-
-#table{
-    width: 700px;
-
-}
-
-#bars{
-    width: 600px;
-    /* max-height: 600px; */
-    background-color: white;
-    /* border: 1px solid red; */
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
-    max-height: 1200px;
-    padding: 5px;
-    height: 960px;
-    border-radius: 5px;
-}
-
-#bars canvas{
-    width: 600px !important;
-    
-}
-
-
-#donutes{
-    background-color: white;
-    /* width: 800px; */
-    /* border: 1px solid red; */
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
-    max-height: 1200px;
-    padding: 5px;
-}
-
-#donutes canvas{
-    width: 200px;
-}
-
-
+    flex-direction: column;
+    gap: 50px;
+    /* justify-content: space-between; */
+  }
+  
+  #table {
+    grid-column: span 4;
+  }
+  
+  h3 {
+    text-align: center;
+  }
+  
