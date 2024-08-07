@@ -29,6 +29,7 @@ app.get('/api/system', async (req, res) => {
     const data = await si.processes();
     const cpu = await si.currentLoad();
     const memory = await si.mem();
+    const fsSizes = await si.fsSize();
 
     // Map all CPU cores
     const cpuCores = cpu.cpus.map((core, index) => ({
@@ -52,6 +53,14 @@ app.get('/api/system', async (req, res) => {
     const totalGpuUsage = gpuModel !== 'N/A' ? gpuModel : 'N/A';
     const totalMemUsage = ((memory.used / memory.total) * 100).toFixed(2);
 
+    // Aggregate disk information
+    const diskInfo = fsSizes.map(fs => ({
+      fs: fs.fs,
+      size: (fs.size / 1e9).toFixed(2), // Convert to GB
+      free: (fs.available / 1e9).toFixed(2), // Convert to GB
+      used: ((fs.size - fs.available) / 1e9).toFixed(2) // Convert to GB
+    }));
+
     res.json({
       cpuModel: cpuData.manufacturer + ' ' + cpuData.brand,
       gpuModel,
@@ -64,6 +73,7 @@ app.get('/api/system', async (req, res) => {
         used: memory.used,
         free: memory.total - memory.used,
       },
+      disks: diskInfo,
       cpuCores,
     });
   } catch (error) {
