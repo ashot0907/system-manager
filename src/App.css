@@ -15,3 +15,17 @@
 #main{
   background-color:  rgb(72, 69, 69);
 }
+
+.terminal-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 300px; /* Adjust the height as needed */
+
+  z-index: 1000; /* Ensure it's on top of other components */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}

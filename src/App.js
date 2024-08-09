@@ -18,6 +18,7 @@ const App = () => {
     memory: { total: '', used: '', free: '' },
   });
   const [showSystemInfo, setShowSystemInfo] = useState(false);
+  const [showTerminal, setShowTerminal] = useState(false); // State for terminal visibility
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/system')
@@ -40,11 +41,18 @@ const App = () => {
     setShowSystemInfo(false);
   };
 
+  const handleToggleTerminal = () => {
+    setShowTerminal(prevState => !prevState); // Toggle terminal visibility
+  };
+
   return (
     <div id="main">
       <Container>
-        <Button variant="contained" color="primary" onClick={handleShowSystemInfo} style={{ marginBottom: '20px' }}>
+        <Button variant="contained" color="primary" onClick={handleShowSystemInfo} style={{ marginBottom: '20px', marginRight: '10px' }}>
           Show System Information
+        </Button>
+        <Button variant="contained" color="secondary" onClick={handleToggleTerminal} style={{ marginBottom: '20px' }}>
+          {showTerminal ? 'Hide Terminal' : 'Show Terminal'}
         </Button>
         {showSystemInfo && (
           <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px', position: 'relative' }}>
@@ -81,26 +89,29 @@ const App = () => {
             )}
           </Paper>
         )}
+        {showTerminal && (
+          <div className="terminal-overlay">
+            <Terminal />
+          </div>
+        )}
       </Container>
       <div className="dashboard">
-          <div className='card'>
+        <div className='card'>
           <SystemInfoComponent />
-          </div>
-          <div className="card">
-            <AppTable />
-          </div>
-          <div className="card">
-            <CpuCoresStream />
-          </div>
-          <div className="card">
-            <SystemCharts />
-          </div>
-          <div className="card">
-            <TotalUsageDonuts memory={systemInfo.memory} />
-          </div>
-            <Terminal/>
         </div>
-        
+        <div className="card">
+          <AppTable />
+        </div>
+        <div className="card">
+          <CpuCoresStream />
+        </div>
+        <div className="card">
+          <SystemCharts />
+        </div>
+        <div className="card">
+          <TotalUsageDonuts memory={systemInfo.memory} />
+        </div>
+      </div>
     </div>
   );
 };
