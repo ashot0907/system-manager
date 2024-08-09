@@ -8,6 +8,7 @@ import TotalUsageDonuts from './TotalUsageDonuts';
 import SystemInfoComponent from './SystemInfoComponent';
 import CpuCoresStream from './CpuCoresStream';
 import './App.css';
+import Terminal from './Terminal';
 
 const App = () => {
   const [systemInfo, setSystemInfo] = useState({
@@ -97,7 +98,9 @@ const App = () => {
           <div className="card">
             <TotalUsageDonuts memory={systemInfo.memory} />
           </div>
+            <Terminal/>
         </div>
+        
     </div>
   );
 };

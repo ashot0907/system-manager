@@ -7,6 +7,7 @@ const app = express();
 const port = 5000;
 
 app.use(cors());
+app.use(express.json()); // Add this to parse JSON bodies
 
 const getGpuInfo = () => {
   return new Promise((resolve, reject) => {
@@ -84,6 +85,18 @@ app.get('/api/system', async (req, res) => {
     console.error('Error fetching system data:', error);
     res.status(500).send(error.toString());
   }
+});
+
+// New route to handle terminal commands
+app.post('/api/execute', (req, res) => {
+  const { command } = req.body;
+  
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      return res.status(500).json({ error: stderr });
+    }
+    res.json({ output: stdout });
+  });
 });
 
 app.listen(port, () => {
