@@ -1,0 +1,52 @@
+.terminal {
+    background-color: #2d2d2d;
+    color: #cccccc;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 10px;
+    border-radius: 5px;
+    overflow: auto;
+    height: 100%;
+  }
+  
+  .terminal-output {
+    white-space: pre-wrap;
+    margin-bottom: 10px;
+  }
+  
+  .terminal-input {
+    display: flex;
+    align-items: center;
+  }
+  
+  .prompt {
+    color: #00ff00;
+  }
+  
+  .command-input {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    outline: none;
+    flex: 1;
+  }
+  
+  .command-input::placeholder {
+    color: #888888;
+  }
+  
+  .command-input::after {
+    content: '|';
+    animation: blink 1s step-end infinite;
+  }
+  
+  @keyframes blink {
+    from, to {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+  
