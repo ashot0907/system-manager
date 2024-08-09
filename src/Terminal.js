@@ -10,6 +10,12 @@ const Terminal = () => {
   const [output, setOutput] = useState('');
 
   const handleCommandSubmit = async () => {
+    if (command.trim() === 'clear') {
+      setOutput('');
+      setCommand('');
+      return;
+    }
+  
     try {
       const response = await axios.post('http://localhost:5000/api/execute', { command });
       setOutput(prevOutput => `${prevOutput}\n${command}\n${response.data.output}`);
