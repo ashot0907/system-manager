@@ -1,55 +1,17 @@
-/* App.css */
+.dashboard{
+  display: flex;
+  /* justify-content: space-around; */
+  gap: 20px;
 
-body {
-    background-color: #1e1e2f;
-    color: #ffffff;
-    font-family: 'Arial', sans-serif;
-  }
-  
-  #main {
-    padding: 20px;
-  }
-  
-  .dashboard {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-  }
-  
-  .card {
-    background-color: #2a2a3b;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .card h3 {
-    margin: 0;
-    margin-bottom: 10px;
-    font-size: 18px;
-  }
-  
-  .chart-container {
-    height: 300px;
-  }
-  
-  .doughnut-chart {
-    height: 250px;
-  }
-  
-  #donuts {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 50px;
-    /* justify-content: space-between; */
-  }
-  
-  #table {
-    grid-column: span 4;
-  }
-  
-  h3 {
-    text-align: center;
-  }
-  
+}
+
+.card{
+  background-color: rgba(199, 239, 199, 0.309);
+  border: 1px solid rgba(172, 255, 47, 0.21);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+#main{
+  background-color:  rgb(72, 69, 69);
+}

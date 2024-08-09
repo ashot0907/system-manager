@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AppTable from './AppTable';
 import SystemCharts from './SystemCharts';
 import TotalUsageDonuts from './TotalUsageDonuts';
+import SystemInfoComponent from './SystemInfoComponent';
 import CpuCoresStream from './CpuCoresStream';
 import './App.css';
 
@@ -79,7 +80,11 @@ const App = () => {
             )}
           </Paper>
         )}
-        <div className="dashboard">
+      </Container>
+      <div className="dashboard">
+          <div className='card'>
+          <SystemInfoComponent />
+          </div>
           <div className="card">
             <AppTable />
           </div>
@@ -93,7 +98,6 @@ const App = () => {
             <TotalUsageDonuts memory={systemInfo.memory} />
           </div>
         </div>
-      </Container>
     </div>
   );
 };

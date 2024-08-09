@@ -66,7 +66,7 @@ app.get('/api/system', async (req, res) => {
     }));
 
     res.json({
-      cpuModel: cpuData.manufacturer + ' ' + cpuData.brand,
+      cpuModel: `${cpuData.manufacturer} ${cpuData.brand}`,
       gpuModel: gpuData[0].model, // Assume one GPU for simplicity
       processes,
       totalCpuUsage,
