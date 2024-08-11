@@ -89,29 +89,45 @@ app.get('/api/system', async (req, res) => {
 
 // New route to handle terminal commands
 
-let currentDirectory = process.cwd(); // Start with the current working directory
+// let currentDirectory = process.cwd();
+
+// app.post('/api/execute', (req, res) => {
+//   let { command } = req.body;
+
+//   // Handle `cd` command
+//   if (command.startsWith('cd ')) {
+//     const newDir = command.slice(3).trim();
+//     try {
+//       process.chdir(newDir);
+//       currentDirectory = process.cwd();
+//       return res.json({ output: `Changed directory to ${currentDirectory}` });
+//     } catch (error) {
+//       return res.status(500).json({ error: `cd: ${newDir}: No such file or directory` });
+//     }
+//   }
+
+//   // Execute other commands in the current directory
+//   exec(command, { cwd: currentDirectory }, (error, stdout, stderr) => {
+//     if (error) {
+//       return res.status(500).json({ error: stderr });
+//     }
+//     res.json({ output: stdout });
+//   });
+// });
+
 
 app.post('/api/execute', (req, res) => {
-  let { command } = req.body;
+  const command = req.body.command;
 
-  // Handle `cd` command
-  if (command.startsWith('cd ')) {
-    const newDir = command.slice(3).trim();
-    try {
-      process.chdir(newDir);
-      currentDirectory = process.cwd();
-      return res.json({ output: `Changed directory to ${currentDirectory}` });
-    } catch (error) {
-      return res.status(500).json({ error: `cd: ${newDir}: No such file or directory` });
-    }
-  }
-
-  // Execute other commands in the current directory
-  exec(command, { cwd: currentDirectory }, (error, stdout, stderr) => {
-    if (error) {
-      return res.status(500).json({ error: stderr });
-    }
-    res.json({ output: stdout });
+  // Execute the command using the child_process exec function
+  exec(command, (error, stdout, stderr) => {
+      if (error) {
+          return res.json({ output: `Error: ${error.message}` });
+      }
+      if (stderr) {
+          return res.json({ output: `Error: ${stderr}` });
+      }
+      return res.json({ output: stdout });
   });
 });
 
