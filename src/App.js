@@ -21,7 +21,7 @@ const App = () => {
   const [showTerminal, setShowTerminal] = useState(false); // State for terminal visibility
 
   useEffect(() => {
-    axios.get('http://158.160.116.57/api/system')
+    axios.get('http://158.160.116.57:5000/api/system')
       .then(response => {
         setSystemInfo({
           cpuModel: response.data.cpuModel,

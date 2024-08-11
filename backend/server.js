@@ -159,20 +159,32 @@ app.get('/api/system-stats', async (req, res) => {
 
 
 
-app.post('/api/execute', (req, res) => {
-  const command = req.body.command;
+let currentDirectory = process.cwd(); // Initialize with the current working directory
 
-  // Execute the command using the child_process exec function
-  exec(command, (error, stdout, stderr) => {
-      if (error) {
-          return res.json({ output: `Error: ${error.message}` });
-      }
-      if (stderr) {
-          return res.json({ output: `Error: ${stderr}` });
-      }
-      return res.json({ output: stdout });
+app.post('/api/execute', (req, res) => {
+  let { command } = req.body;
+
+  // Handle `cd` command
+  if (command.startsWith('cd ')) {
+    const newDir = command.slice(3).trim();
+    try {
+      process.chdir(newDir); // Change the current working directory
+      currentDirectory = process.cwd();
+      return res.json({ output: `Changed directory to ${currentDirectory}` });
+    } catch (error) {
+      return res.status(500).json({ output: `cd: ${newDir}: No such file or directory` });
+    }
+  }
+
+  // Execute other commands in the current directory
+  exec(command, { cwd: currentDirectory }, (error, stdout, stderr) => {
+    if (error) {
+      return res.status(500).json({ output: stderr });
+    }
+    res.json({ output: stdout });
   });
 });
+
 
 app.listen(port, () => {
   console.log(`Server running on http://158.160.116.57:${port}`);
