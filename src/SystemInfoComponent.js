@@ -1,51 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
-import './SystemInfoComponent.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Typography, Box, CircularProgress } from '@mui/material';
+import CpuIcon from '@mui/icons-material/Memory';
+import GpuIcon from '@mui/icons-material/GraphicEq';
+import MemoryIcon from '@mui/icons-material/Storage';
 
-function SystemInfoComponent() {
-  const [systemData, setSystemData] = useState(null);
+const SystemInfoComponent = () => {
+    const [stats, setStats] = useState({
+        cpuTemp: null,
+        gpuTemp: null,
+        memoryFree: null,
+        memoryTotal: null,
+        gpuMemoryFree: null,
+        gpuMemoryTotal: null,
+        cpuUsage: null,
+    });
 
-  useEffect(() => {
-    fetch('http://localhost:5000/api/system')
-      .then(response => response.json())
-      .then(data => setSystemData(data))
-      .catch(error => console.error('Error fetching system data:', error));
-  }, []);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://158.160.116.57:5000/api/system-stats');
+                setStats(response.data);
+            } catch (error) {
+                console.error('Error fetching system stats:', error);
+            }
+        };
 
-  if (!systemData) {
-    return <div>Loading...</div>;
-  }
+        fetchData();
+    }, []);
 
-  return (
-    <div className="system-info">
-      <div className="info-section">
-        <h2>CPU: {systemData.cpuModel}</h2>
-        <div className="circular-container">
-          <div className="circular-progress">
-            <CircularProgress variant="determinate" value={51} size={100} />
-            <div className="label">TEMP<br/>{systemData.cpuTemp}°C</div>
-          </div>
-          <div className="circular-progress">
-            <CircularProgress variant="determinate" value={Number(systemData.totalCpuUsage)} size={100} />
-            <div className="label">LOAD<br/>{systemData.totalCpuUsage}%</div>
-          </div>
-        </div>
-      </div>
-      <div className="info-section">
-        <h2>GPU: {systemData.gpuModel}</h2>
-        <div className="circular-container">
-          <div className="circular-progress">
-            <CircularProgress variant="determinate" value={66} size={100} />
-            <div className="label">TEMP<br/>{systemData.gpuTemp}°C</div>
-          </div>
-          <div className="circular-progress">
-            <CircularProgress variant="determinate" value={Number(systemData.totalGpuUsage)} size={100} />
-            <div className="label">LOAD<br/>{systemData.totalGpuUsage}%</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+    return (
+        <Box>
+            <Typography variant="h4" gutterBottom>
+                System Information
+            </Typography>
+            <Box display="flex" alignItems="center">
+                <CpuIcon style={{ marginRight: 8 }} />
+                <Typography variant="h6">
+                    CPU Temp: {stats.cpuTemp !== null ? `${stats.cpuTemp} °C` : 'N/A'}
+                </Typography>
+            </Box>
+            <Box display="flex" alignItems="center" mt={2}>
+                <MemoryIcon style={{ marginRight: 8 }} />
+                <Typography variant="h6">
+                    Memory: {stats.memoryFree !== null && stats.memoryTotal !== null ? `${stats.memoryFree} free / ${stats.memoryTotal} total` : <CircularProgress size={24} />}
+                </Typography>
+            </Box>
+            <Box display="flex" alignItems="center" mt={2}>
+                <GpuIcon style={{ marginRight: 8 }} />
+                <Typography variant="h6">
+                    GPU Temp: {stats.gpuTemp !== null ? `${stats.gpuTemp} °C` : 'N/A'}
+                </Typography>
+                <Typography variant="h6" mt={1}>
+                    GPU Memory: {stats.gpuMemoryFree !== null && stats.gpuMemoryTotal !== null ? `${stats.gpuMemoryFree} MB free / ${stats.gpuMemoryTotal} MB total` : 'N/A'}
+                </Typography>
+            </Box>
+        </Box>
+    );
+};
 
 export default SystemInfoComponent;

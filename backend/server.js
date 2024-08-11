@@ -2,6 +2,8 @@ const express = require('express');
 const si = require('systeminformation');
 const cors = require('cors');
 const { exec } = require('child_process');
+const systeminformation = require('systeminformation'); // Import systeminformation
+
 
 const app = express();
 const port = 5000;
@@ -87,6 +89,8 @@ app.get('/api/system', async (req, res) => {
   }
 });
 
+
+
 // New route to handle terminal commands
 
 // let currentDirectory = process.cwd();
@@ -115,6 +119,45 @@ app.get('/api/system', async (req, res) => {
 //   });
 // });
 
+app.get('/api/system-stats', async (req, res) => {
+  try {
+    // Get CPU temperature
+    const cpuTemp = await systeminformation.cpuTemperature();
+    
+    // Get memory information
+    const memory = await systeminformation.mem();
+    
+    // Get GPU information
+    const gpu = await systeminformation.graphics();
+    const gpuInfo = gpu.controllers && gpu.controllers.length > 0 ? gpu.controllers[0] : {};
+    const gpuTemperature = gpuInfo.temperatureGpu !== undefined ? gpuInfo.temperatureGpu : 'N/A';
+    const gpuMemoryFree = gpuInfo.memoryFree !== undefined ? gpuInfo.memoryFree : 'N/A';
+    const gpuMemoryTotal = gpuInfo.memoryTotal !== undefined ? gpuInfo.memoryTotal : 'N/A';
+
+    // Convert memory values from bytes to GB and MB
+    const memoryFreeGB = (memory.free / (1024 * 1024 * 1024)).toFixed(2);
+    const memoryTotalGB = (memory.total / (1024 * 1024 * 1024)).toFixed(2);
+    const gpuMemoryFreeMB = (gpuMemoryFree / 1024).toFixed(2);
+    const gpuMemoryTotalMB = (gpuMemoryTotal / 1024).toFixed(2);
+
+    // Respond with the system stats
+    res.json({
+      cpuTemp: cpuTemp.main !== null ? cpuTemp.main : 'N/A',
+      gpuTemp: gpuTemperature,
+      memoryFree: `${memoryFreeGB} GB`,
+      memoryTotal: `${memoryTotalGB} GB`,
+      gpuMemoryFree: `${gpuMemoryFreeMB} MB`,
+      gpuMemoryTotal: `${gpuMemoryTotalMB} MB`,
+      cpuUsage: cpuTemp.current !== null ? cpuTemp.current : 'N/A',
+    });
+  } catch (error) {
+    console.error('Error fetching system stats:', error);
+    res.status(500).send('Error fetching system stats');
+  }
+});
+
+
+
 
 app.post('/api/execute', (req, res) => {
   const command = req.body.command;
@@ -132,5 +175,5 @@ app.post('/api/execute', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on http://158.160.116.57:${port}`);
 });

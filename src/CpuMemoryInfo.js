@@ -12,7 +12,7 @@ const CpuMemoryInfo = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/cpu-memory-info')
+    axios.get('http://158.160.116.57:5000/api/cpu-memory-info')
       .then(response => {
         setCpuLoad(response.data.cpuLoad);
         setCpuTemp(response.data.cpuTemp);

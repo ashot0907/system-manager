@@ -17,7 +17,7 @@ const Terminal = () => {
     }
   
     try {
-      const response = await axios.post('http://localhost:5000/api/execute', { command });
+      const response = await axios.post('http://158.160.116.57:5000/api/execute', { command });
       setOutput(prevOutput => `${prevOutput}\n${command}\n${response.data.output}`);
       setCommand(''); // Clear the command input
     } catch (error) {

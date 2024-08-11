@@ -21,7 +21,7 @@ const App = () => {
   const [showTerminal, setShowTerminal] = useState(false); // State for terminal visibility
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/system')
+    axios.get('http://158.160.116.57/api/system')
       .then(response => {
         setSystemInfo({
           cpuModel: response.data.cpuModel,
@@ -96,9 +96,9 @@ const App = () => {
         )}
       </Container>
       <div className="dashboard">
-        <div className='card'>
+        {/* <div className='card'>
           <SystemInfoComponent />
-        </div>
+        </div> */}
         <div className="card">
           <AppTable />
         </div>
