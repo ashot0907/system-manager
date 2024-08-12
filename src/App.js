@@ -8,6 +8,7 @@ import TotalUsageDonuts from './TotalUsageDonuts';
 import SystemInfoComponent from './SystemInfoComponent';
 import CpuCoresStream from './CpuCoresStream';
 import './App.css';
+import FileSystem from './FileSystem'
 import Terminal from './Terminal';
 
 const App = () => {
@@ -96,21 +97,7 @@ const App = () => {
         )}
       </Container>
       <div className="dashboard">
-        {/* <div className='card'>
-          <SystemInfoComponent />
-        </div> */}
-        <div className="card">
-          <AppTable />
-        </div>
-        <div className="card">
-          <CpuCoresStream />
-        </div>
-        <div className="card">
-          <SystemCharts />
-        </div>
-        <div className="card">
-          <TotalUsageDonuts memory={systemInfo.memory} />
-        </div>
+        <FileSystem/>
       </div>
     </div>
   );
