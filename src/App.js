@@ -5,11 +5,26 @@ import CloseIcon from '@mui/icons-material/Close';
 import AppTable from './AppTable';
 import SystemCharts from './SystemCharts';
 import TotalUsageDonuts from './TotalUsageDonuts';
-import SystemInfoComponent from './SystemInfoComponent';
 import CpuCoresStream from './CpuCoresStream';
-import './App.css';
-import FileSystem from './FileSystem'
+import FileSystem from './FileSystem';
 import Terminal from './Terminal';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import './App.css';
+
+// Minimal theme setup to avoid undefined properties
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2', // Default primary color
+    },
+    secondary: {
+      main: '#dc004e', // Default secondary color
+    },
+    background: {
+      default: '#f5f5f5', // Default background color
+    },
+  },
+});
 
 const App = () => {
   const [systemInfo, setSystemInfo] = useState({
@@ -19,7 +34,8 @@ const App = () => {
     memory: { total: '', used: '', free: '' },
   });
   const [showSystemInfo, setShowSystemInfo] = useState(false);
-  const [showTerminal, setShowTerminal] = useState(false); // State for terminal visibility
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   useEffect(() => {
     axios.get('http://158.160.116.57:5000/api/system')
@@ -43,63 +59,92 @@ const App = () => {
   };
 
   const handleToggleTerminal = () => {
-    setShowTerminal(prevState => !prevState); // Toggle terminal visibility
+    setShowTerminal(prevState => !prevState);
+  };
+
+  const handleToggleDashboard = () => {
+    setShowDashboard(prevState => !prevState);
   };
 
   return (
-    <div id="main">
-      <Container>
-        <Button variant="contained" color="primary" onClick={handleShowSystemInfo} style={{ marginBottom: '20px', marginRight: '10px' }}>
-          Show System Information
-        </Button>
-        <Button variant="contained" color="secondary" onClick={handleToggleTerminal} style={{ marginBottom: '20px' }}>
-          {showTerminal ? 'Hide Terminal' : 'Show Terminal'}
-        </Button>
-        {showSystemInfo && (
-          <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px', position: 'relative' }}>
-            <IconButton
-              onClick={handleCloseSystemInfo}
-              style={{ position: 'absolute', top: '10px', right: '10px' }}
-            >
-              <CloseIcon />
-            </IconButton>
-            <Typography variant="h4" component="h1" gutterBottom>
-              System Information
-            </Typography>
-            <Typography variant="h6" component="h2">
-              CPU: {systemInfo.cpuModel}
-            </Typography>
-            <Typography variant="h6" component="h2">
-              GPU: {systemInfo.gpuModel}
-            </Typography>
-            {systemInfo.disks.length > 0 ? (
-              systemInfo.disks.map((disk, index) => (
-                <div key={index}>
-                  <Typography variant="h6" component="h2">
-                    Disk: {disk.fs}
-                  </Typography>
-                  <Typography variant="h6" component="h2">
-                    {disk.free} GB free from {disk.size} GB
-                  </Typography>
-                </div>
-              ))
-            ) : (
-              <Typography variant="h6" component="h2">
-                No disk information available.
+    <ThemeProvider theme={theme}>
+      <div id="main">
+        <Container>
+          <Button variant="contained" color="primary" onClick={handleShowSystemInfo} style={{ marginBottom: '20px', marginRight: '10px' }}>
+            Show System Information
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleToggleTerminal} style={{ marginBottom: '20px', marginRight: '10px' }}>
+            {showTerminal ? 'Hide Terminal' : 'Show Terminal'}
+          </Button>
+          <Button variant="contained" onClick={handleToggleDashboard} style={{ marginBottom: '20px' }}>
+            {showDashboard ? 'Server Management' : 'Show Monitor Resources'}
+          </Button>
+          
+          {showSystemInfo && (
+            <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px', position: 'relative' }}>
+              <IconButton
+                onClick={handleCloseSystemInfo}
+                style={{ position: 'absolute', top: '10px', right: '10px' }}
+              >
+                <CloseIcon />
+              </IconButton>
+              <Typography variant="h4" component="h1" gutterBottom>
+                System Information
               </Typography>
-            )}
-          </Paper>
-        )}
-        {showTerminal && (
-          <div className="terminal-overlay">
-            <Terminal />
-          </div>
-        )}
-      </Container>
-      <div className="dashboard">
-        <FileSystem/>
+              <Typography variant="h6" component="h2">
+                CPU: {systemInfo.cpuModel}
+              </Typography>
+              <Typography variant="h6" component="h2">
+                GPU: {systemInfo.gpuModel}
+              </Typography>
+              {systemInfo.disks.length > 0 ? (
+                systemInfo.disks.map((disk, index) => (
+                  <div key={index}>
+                    <Typography variant="h6" component="h2">
+                      Disk: {disk.fs}
+                    </Typography>
+                    <Typography variant="h6" component="h2">
+                      {disk.free} GB free from {disk.size} GB
+                    </Typography>
+                  </div>
+                ))
+              ) : (
+                <Typography variant="h6" component="h2">
+                  No disk information available.
+                </Typography>
+              )}
+            </Paper>
+          )}
+          
+          {showTerminal && (
+            <div className="terminal-overlay">
+              <Terminal />
+            </div>
+          )}
+        </Container>
+        
+        <div className="dashboard">
+          {showDashboard ? (
+            <>
+              <div className="card">
+                <AppTable />
+              </div>
+              <div className="card">
+                <CpuCoresStream />
+              </div>
+              <div className="card">
+                <SystemCharts />
+              </div>
+              <div className="card">
+                <TotalUsageDonuts memory={systemInfo.memory} />
+              </div>
+            </>
+          ) : (
+            <FileSystem />
+          )}
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 };
 
