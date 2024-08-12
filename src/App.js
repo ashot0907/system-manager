@@ -74,7 +74,7 @@ const App = () => {
             Show System Information
           </Button>
           <Button variant="contained" color="secondary" onClick={handleToggleTerminal} style={{ marginBottom: '20px', marginRight: '10px' }}>
-            {showTerminal ? 'Hide Terminal' : 'Show Terminal'}
+            {showTerminal ? 'Hide Terminal' : 'Open Terminal'}
           </Button>
           <Button variant="contained" onClick={handleToggleDashboard} style={{ marginBottom: '20px' }}>
             {showDashboard ? 'Server Management' : 'Show Monitor Resources'}
