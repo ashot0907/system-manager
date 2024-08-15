@@ -11,7 +11,7 @@ const AppTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(15);
 
   useEffect(() => {
-    axios.get('http://158.160.116.57:5000/api/system')
+    axios.get('http://localhost:5000/api/system')
       .then(response => {
         const sortedTasks = response.data.processes
           .filter(task => task.cpu > 0 || task.gpu > 0 || task.mem > 0)

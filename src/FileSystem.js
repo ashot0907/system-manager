@@ -12,7 +12,7 @@ function FileSystem() {
 
     useEffect(() => {
         if (!selectedFile) {
-            fetch(`http://158.160.116.57:5005/files?path=${encodeURIComponent(currentPath)}`)
+            fetch(`http://localhost:5005/files?path=${encodeURIComponent(currentPath)}`)
                 .then(response => response.json())
                 .then(data => setFiles(data))
                 .catch(error => console.error('Error fetching files:', error));
@@ -33,7 +33,7 @@ function FileSystem() {
     };
 
     const handleFileClick = (file) => {
-        fetch(`http://158.160.116.57:5005/files/content?path=${encodeURIComponent(file.path)}`)
+        fetch(`http://localhost:5005/files/content?path=${encodeURIComponent(file.path)}`)
             .then(response => response.text())
             .then(data => {
                 setSelectedFile(file);
@@ -45,7 +45,7 @@ function FileSystem() {
     };
 
     const handleSave = () => {
-        fetch(`http://158.160.116.57:5005/files/save`, {
+        fetch(`http://localhost:5005/files/save`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ function FileSystem() {
 
     const handleDelete = () => {
         if (contextMenu && contextMenu.file) {
-            fetch(`http://158.160.116.57:5005/files/delete`, {
+            fetch(`http://localhost:5005/files/delete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ function FileSystem() {
     const handleRename = () => {
         const newName = prompt('Enter the new name:', contextMenu.file.name);
         if (newName) {
-            fetch(`http://158.160.116.57:5005/files/rename`, {
+            fetch(`http://localhost:5005/files/rename`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ function FileSystem() {
     const handleCreateFolder = () => {
         const folderName = prompt('Enter the folder name:');
         if (folderName) {
-            fetch(`http://158.160.116.57:5005/files/create-folder`, {
+            fetch(`http://localhost:5005/files/create-folder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ function FileSystem() {
     const handleCreateTextFile = () => {
         const fileName = prompt('Enter the file name (with .txt extension):');
         if (fileName) {
-            fetch(`http://158.160.116.57:5005/files/create-text-file`, {
+            fetch(`http://localhost:5005/files/create-text-file`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -188,13 +188,13 @@ function FileSystem() {
                 <>
                     {currentPath !== '/' && (
                         <div className="file-icon" onClick={handleGoBack} onContextMenu={(e) => handleContextMenu(e, null)}>
-                            <img src="/imgs/gobackdir.jpg" alt="folder icon" />
+                            <img src="/imgs/gobackdir.png" alt="folder icon" />
                             <p>..</p>
                         </div>
                     )}
                     {files.map((file, index) => (
                         <div key={index} className="file-icon" onClick={() => file.isDirectory ? handleDirectoryClick(file.path) : handleFileClick(file)} onContextMenu={(e) => handleContextMenu(e, file)}>
-                            <img src={file.isDirectory ? "/imgs/folder.jpg" : "/imgs/file.png"} alt={file.isDirectory ? "folder icon" : "file icon"} />
+                            <img src={file.isDirectory ? "/imgs/folder.png" : "/imgs/file.png"} alt={file.isDirectory ? "folder icon" : "file icon"} />
                             <p>{file.name}</p>
                         </div>
                     ))}

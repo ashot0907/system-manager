@@ -4,24 +4,28 @@ import { Container, Paper, Typography, IconButton, Button } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import AppTable from './AppTable';
 import SystemCharts from './SystemCharts';
+import terminalImg from './assets/terminal.png';
+import serverManagementImg from './assets/servermanagement.png';
+import monitorResourcesImg from './assets/monitorresorses.png';
 import TotalUsageDonuts from './TotalUsageDonuts';
 import CpuCoresStream from './CpuCoresStream';
 import FileSystem from './FileSystem';
 import Terminal from './Terminal';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './App.css';
+import infoIcon from './assets/infoIcon.png'
 
 // Minimal theme setup to avoid undefined properties
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2', // Default primary color
+      main: '#fffff', // Default primary color
     },
     secondary: {
-      main: '#dc004e', // Default secondary color
+      main: '#fffff', // Default secondary color
     },
     background: {
-      default: '#f5f5f5', // Default background color
+      default: '#fffff', // Default background color
     },
   },
 });
@@ -38,7 +42,7 @@ const App = () => {
   const [showDashboard, setShowDashboard] = useState(false);
 
   useEffect(() => {
-    axios.get('http://158.160.116.57:5000/api/system')
+    axios.get('http://localhost:5000/api/system')
       .then(response => {
         setSystemInfo({
           cpuModel: response.data.cpuModel,
@@ -70,15 +74,36 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <div id="main">
         <Container>
-          <Button variant="contained" color="primary" onClick={handleShowSystemInfo} style={{ marginBottom: '20px', marginRight: '10px' }}>
-            Show System Information
+          <Button   id='btn' onClick={handleShowSystemInfo} style={{ marginBottom: '20px', marginRight: '10px' }}>
+          <img 
+          src={infoIcon} 
+          alt={'System Info'} 
+          style={{ width: '100px', height: '100px' }} 
+        />
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleToggleTerminal} style={{ marginBottom: '20px', marginRight: '10px' }}>
-            {showTerminal ? 'Hide Terminal' : 'Open Terminal'}
-          </Button>
-          <Button variant="contained" onClick={handleToggleDashboard} style={{ marginBottom: '20px' }}>
-            {showDashboard ? 'Server Management' : 'Show Monitor Resources'}
-          </Button>
+          <Button 
+           id='btn'
+        onClick={handleToggleTerminal} 
+        style={{ marginBottom: '20px', marginRight: '10px' }}
+      >
+        <img 
+          src={showTerminal ? terminalImg : terminalImg} 
+          alt={showTerminal ? 'Hide Terminal' : 'Open Terminal'} 
+          style={{ width: '100px', height: '100px' }} 
+        />
+      </Button>
+      <Button 
+        id='btn'
+        onClick={handleToggleDashboard} 
+        style={{ marginBottom: '20px', marginRight: '10px' }}
+      >
+        <img 
+          src={showDashboard ? serverManagementImg : monitorResourcesImg} 
+          alt={showDashboard ? 'Server Management' : 'Show Monitor Resources'} 
+          style={{ width: '100px', height: '100px' }} 
+        />
+      </Button>
+      
           
           {showSystemInfo && (
             <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px', position: 'relative' }}>

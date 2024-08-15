@@ -26,7 +26,7 @@ const CpuCoresStream = () => {
   const [processes, setProcesses] = useState([]);
 
   useEffect(() => {
-    axios.get('http://158.160.116.57:5000/api/system')
+    axios.get('http://localhost:5000/api/system')
       .then(response => {
         setCpuCores(response.data.cpuCores || []);
         setProcesses(response.data.processes || []);

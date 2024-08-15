@@ -17,7 +17,7 @@ const TotalUsageDonuts = () => {
   const [memory, setMemory] = useState({ total: 0, used: 0, free: 0 });
 
   useEffect(() => {
-    axios.get('http://158.160.116.57:5000/api/system')
+    axios.get('http://localhost:5000/api/system')
       .then(response => {
         setTotalCpuUsage(response.data.totalCpuUsage);
         setTotalGpuUsage(response.data.totalGpuUsage);

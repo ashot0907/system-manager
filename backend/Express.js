@@ -114,5 +114,5 @@ app.post('/files/delete', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://158.160.116.57:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });

@@ -187,5 +187,5 @@ app.post('/api/execute', (req, res) => {
 
 
 app.listen(port, () => {
-  console.log(`Server running on http://158.160.116.57:${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
