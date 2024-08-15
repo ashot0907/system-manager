@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import { Container, Button } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import TaskManager from './TaskManager';
 import FileSystem from './FileSystem';
@@ -25,11 +24,54 @@ const theme = createTheme({
 });
 
 const App = () => {
-  const [showTerminal, setShowTerminal] = useState(false);
+  const [terminals, setTerminals] = useState([]); // Array of terminal instances
+  const [nextTerminalId, setNextTerminalId] = useState(1);
 
-  const toggleTerminal = () => {
-    setShowTerminal((prev) => !prev);
+  const addTerminal = () => {
+    setTerminals((prevTerminals) => [
+      ...prevTerminals,
+      { id: nextTerminalId, isFullscreen: false, isMinimized: false, output: '', command: '' },
+    ]);
+    setNextTerminalId(nextTerminalId + 1);
   };
+
+  const closeTerminal = (id) => {
+    setTerminals((prevTerminals) => prevTerminals.filter((terminal) => terminal.id !== id));
+  };
+
+  const minimizeTerminal = (id) => {
+    setTerminals((prevTerminals) =>
+      prevTerminals.map((terminal) =>
+        terminal.id === id ? { ...terminal, isMinimized: true } : terminal
+      )
+    );
+  };
+
+  const restoreTerminal = (id) => {
+    setTerminals((prevTerminals) =>
+      prevTerminals.map((terminal) =>
+        terminal.id === id ? { ...terminal, isMinimized: false } : terminal
+      )
+    );
+  };
+
+  const toggleFullscreen = (id) => {
+    setTerminals((prevTerminals) =>
+      prevTerminals.map((terminal) =>
+        terminal.id === id ? { ...terminal, isFullscreen: !terminal.isFullscreen } : terminal
+      )
+    );
+  };
+
+  const updateTerminalState = (id, command, output) => {
+    setTerminals((prevTerminals) =>
+      prevTerminals.map((terminal) =>
+        terminal.id === id ? { ...terminal, command, output } : terminal
+      )
+    );
+  };
+
+  const minimizedTerminals = terminals.filter((t) => t.isMinimized);
 
   return (
     <ThemeProvider theme={theme}>
@@ -39,11 +81,28 @@ const App = () => {
             <Route path="/file-system" element={<FileSystem />} />
             <Route path="/task-manager" element={<TaskManager />} />
           </Routes>
-          <Navbar toggleTerminal={toggleTerminal} />
-          {showTerminal && (
-            <div className="terminal-overlay">
-              <Terminal />
-            </div>
+          <Navbar
+            onTerminalClick={addTerminal}
+            minimizedTerminals={minimizedTerminals}
+            restoreTerminal={restoreTerminal}
+          />
+          {terminals.map((terminal) =>
+            !terminal.isMinimized ? (
+              <div
+                key={terminal.id}
+                className={terminal.isFullscreen ? 'terminal-overlay fullscreen' : 'terminal-overlay'}
+              >
+                <Terminal
+                  onClose={() => closeTerminal(terminal.id)}
+                  onCollapse={() => minimizeTerminal(terminal.id)}
+                  onExpand={() => toggleFullscreen(terminal.id)}
+                  isFullscreen={terminal.isFullscreen}
+                  command={terminal.command}
+                  output={terminal.output}
+                  updateState={(command, output) => updateTerminalState(terminal.id, command, output)}
+                />
+              </div>
+            ) : null
           )}
         </div>
       </Router>
@@ -51,20 +110,26 @@ const App = () => {
   );
 };
 
-const Navbar = ({ toggleTerminal }) => {
+const Navbar = ({ onTerminalClick, minimizedTerminals, restoreTerminal }) => {
   const navigate = useNavigate();
 
   return (
     <div className="dock">
-      <Button id="btn" onClick={() => navigate('/file-system')}>
+      <button id="btn" onClick={() => navigate('/file-system')}>
         <img src={monitorResourcesImg} alt="File System" />
-      </Button>
-      <Button id="btn" onClick={() => navigate('/task-manager')}>
+      </button>
+      <button id="btn" onClick={() => navigate('/task-manager')}>
         <img src={serverManagementImg} alt="Task Manager" />
-      </Button>
-      <Button id="btn" onClick={toggleTerminal}>
-        <img src={terminalImg} alt="Terminal" />
-      </Button>
+      </button>
+      <button id="btn" onClick={onTerminalClick}>
+        <img src={terminalImg} alt="New Terminal" />
+      </button>
+      {minimizedTerminals.length > 0 && <hr className="dock-divider" />}
+      {minimizedTerminals.map((terminal) => (
+        <button key={terminal.id} id="btn" onClick={() => restoreTerminal(terminal.id)}>
+          <img src={terminalImg} alt={`Terminal ${terminal.id}`} />
+        </button>
+      ))}
     </div>
   );
 };
