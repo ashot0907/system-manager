@@ -1,0 +1,13 @@
+.dashboard {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    height: 100%;
+  }
+  
+  .card {
+    border: 1px solid rgba(172, 255, 47, 0.21);
+    padding: 10px;
+    border-radius: 10px;
+  }
+  

@@ -1,36 +1,69 @@
-.dashboard{
+#main {
+  background-color: #1e1e1e;
+  height: calc(100vh - 100px); /* Adjust height to account for the dock */
   display: flex;
-  /* justify-content: space-around; */
-  gap: 20px;
+  flex-direction: column;
+  padding-top: 100px; /* Leave space for the dock */
+}
+
+body {
+  background-color: #1e1e1e;
+  margin: 0; /* Ensure there's no margin around the body */
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dock {
+  display: flex;
   justify-content: center;
-
-}
-
-.card{
-  background-color: rgba(199, 239, 199, 0.309);
-  border: 1px solid rgba(172, 255, 47, 0.21);
+  align-items: flex-end;
   padding: 10px;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.043);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 20px; /* Keep the dock at the top of the screen */
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  z-index: 1000;
+  height: 80px; /* Set height for the dock */
 }
 
-#main{
-  background-color:  rgb(72, 69, 69);
+
+#btn {
+  width: 80px;
+  height: 80px;
+  transition: all 0.3s ease-in-out;
+  margin: 0 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+#btn img {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease-in-out;
+}
+
+#btn:hover img {
+  transform: scale(1.2);
 }
 
 .terminal-overlay {
-  position: fixed;
-  bottom: 0;
+  position: relative;
+  bottom: 500px;
   left: 0;
   right: 0;
-  height: 300px; /* Adjust the height as needed */
-
-  z-index: 1000; /* Ensure it's on top of other components */
+  height: 1px;
+  z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;
-}
-
-#btn{
-  width: 100px;
+  /* padding: 10px; */
+  
 }
