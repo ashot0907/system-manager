@@ -186,6 +186,48 @@ app.post('/api/execute', (req, res) => {
 });
 
 
+// Add this route to your existing server.js code
+app.get('/api/used-ports', (req, res) => {
+  console.log('Received request for /api/used-ports');
+  exec(`sudo lsof -iTCP -sTCP:LISTEN -n -P`, (error, stdout, stderr) => {
+      if (error) {
+          console.error(`exec error: ${error}`);
+          return res.status(500).json({ error: 'Something went wrong' });
+      }
+      const lines = stdout.split('\n').filter(line => line.trim() !== '');
+      const data = lines.slice(1).map(line => {
+          const parts = line.trim().split(/\s+/);
+          const [command, pid, user, , , , , , port] = parts;
+          const args = parts.slice(8).join(' ');
+          return {
+              user,
+              port,
+              pid,
+              command,
+              args
+          };
+      });
+      res.json(data);
+  });
+});
+
+
+app.post('/api/stop-process', (req, res) => {
+  const { pid } = req.body;
+  if (!pid) {
+      return res.status(400).json({ error: 'PID is required' });
+  }
+  exec(`kill -9 ${pid}`, (error, stdout, stderr) => {
+      if (error) {
+          console.error(`exec error: ${error}`);
+          return res.status(500).json({ error: `Failed to stop process with PID ${pid}: ${stderr}` });
+      }
+      res.json({ success: true, message: `Process with PID ${pid} stopped successfully` });
+  });
+});
+
+
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });

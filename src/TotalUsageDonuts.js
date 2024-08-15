@@ -35,7 +35,7 @@ const TotalUsageDonuts = () => {
     labels: ['Used CPU %', 'Free CPU %'],
     datasets: [{
       data: [totalCpuUsage, 100 - totalCpuUsage],
-      backgroundColor: ['#FF6384', '#36A2EB'],
+      backgroundColor: ['rgba(172, 255, 47, 0.21)', '#36A2EB'],
     }],
   };
 

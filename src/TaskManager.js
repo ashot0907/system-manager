@@ -6,6 +6,7 @@ import SystemCharts from './SystemCharts';
 import TotalUsageDonuts from './TotalUsageDonuts';
 import CpuCoresStream from './CpuCoresStream';
 import './TaskManager.css'; // Ensure this file exists or remove this line if unnecessary
+import UsedPorts from './UsedPorts';
 
 const TaskManager = () => {
   const [systemInfo, setSystemInfo] = useState({
@@ -31,6 +32,9 @@ const TaskManager = () => {
   return (
     <Container style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div className="dashboard">
+        <div className="card">
+          <UsedPorts />
+        </div>
         <div className="card">
           <AppTable />
         </div>
