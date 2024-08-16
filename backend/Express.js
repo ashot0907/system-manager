@@ -2,12 +2,47 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
+const pam = require('authenticate-pam'); // Add this for password authentication
+const { exec } = require('child_process');
+
 
 const app = express();
 const PORT = 5005;
 
 app.use(cors()); 
 app.use(express.json());
+// login
+app.get('/api/users', (req, res) => {
+    exec('dscl . list /Users UniqueID | awk \'$2 >= 500 { print $1 }\'', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error fetching users: ${stderr}`);
+            return res.status(500).json({ error: 'Failed to fetch users' });
+        }
+        console.log('Fetched users:', stdout);
+        const users = stdout.split('\n').filter(user => user);
+        res.json({ users });
+    });
+});
+
+// Authenticate user with PAM
+app.post('/api/authenticate', (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    pam.authenticate(username, password, (err) => {
+        if (err) {
+            console.error(`Authentication failed for ${username}:`, err);
+            return res.status(401).json({ error: 'Authentication failed', details: err.message || err });
+        }
+        res.json({ success: true });
+    });
+});
+
+
+
+  
 
 // Endpoint to get files and directories in a given path
 app.get('/files', (req, res) => {

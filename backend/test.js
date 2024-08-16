@@ -1,11 +1,9 @@
-const si = require('systeminformation');
+const pam = require('authenticate-pam');
 
-(async () => {
-  try {
-    // Get CPU temperature
-    const cpuTemp = await si.cpuTemperature();
-    console.log(`CPU Temperature: ${cpuTemp.main} °C`);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-})();
+pam.authenticate('User33', '12345678', (err) => {
+    if (err) {
+        console.error('Authentication failed:', err);
+    } else {
+        console.log('Authentication succeeded');
+    }
+});

@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import TaskManager from './TaskManager';
 import FileSystem from './FileSystem';
 import Terminal from './Terminal';
 import SystemInfo from './SystemInfo';
+import LoginPage from './LoginPage';
+import { AuthProvider, useAuth } from './AuthContext';
+import ProtectedRoute from './ProtectedRoute';
 import terminalImg from './assets/terminal.png';
 import monitorResourcesImg from './assets/servermanagement.png';
 import serverManagementImg from './assets/monitorresorses.png';
-import InfoIcon from './assets/infoIcon.png'; // Import the system info icon
+import InfoIcon from './assets/infoIcon.png';
 import './App.css';
 
 const theme = createTheme({
@@ -25,10 +28,25 @@ const theme = createTheme({
   },
 });
 
-const App = () => {
-  const [terminals, setTerminals] = useState([]); // Array of terminal instances
+const AppContent = () => {
+  const { isAuthenticated, logout } = useAuth();
+  const [terminals, setTerminals] = useState([]);
   const [nextTerminalId, setNextTerminalId] = useState(1);
   const [systemInfo, setSystemInfo] = useState({ isOpen: false, isFullscreen: false, isMinimized: false });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === 'l') {
+        logout();
+        navigate('/');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [logout, navigate]);
 
   const addTerminal = () => {
     setTerminals((prevTerminals) => [
@@ -97,13 +115,14 @@ const App = () => {
   const minimizedTerminals = terminals.filter((t) => t.isMinimized);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <div id="main">
-          <Routes>
-            <Route path="/file-system" element={<FileSystem />} />
-            <Route path="/task-manager" element={<TaskManager />} />
-          </Routes>
+    <div id="main">
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/file-system" element={<ProtectedRoute component={FileSystem} />} />
+        <Route path="/task-manager" element={<ProtectedRoute component={TaskManager} />} />
+      </Routes>
+      {isAuthenticated && (
+        <>
           <Navbar
             onTerminalClick={addTerminal}
             onSystemInfoClick={openSystemInfo}
@@ -138,9 +157,9 @@ const App = () => {
               />
             </div>
           )}
-        </div>
-      </Router>
-    </ThemeProvider>
+        </>
+      )}
+    </div>
   );
 };
 
@@ -159,7 +178,7 @@ const Navbar = ({ onTerminalClick, onSystemInfoClick, minimizedTerminals, restor
         <img src={terminalImg} alt="New Terminal" />
       </button>
       <button id="btn" onClick={onSystemInfoClick}>
-        <img src={InfoIcon} alt="System Info" /> {/* System Info button */}
+        <img src={InfoIcon} alt="System Info" />
       </button>
       {minimizedTerminals.length > 0 && <hr className="dock-divider" />}
       {minimizedTerminals.map((terminal) => (
@@ -170,5 +189,15 @@ const Navbar = ({ onTerminalClick, onSystemInfoClick, minimizedTerminals, restor
     </div>
   );
 };
+
+const App = () => (
+  <ThemeProvider theme={theme}>
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
+  </ThemeProvider>
+);
 
 export default App;
