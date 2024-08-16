@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, styled } from '@mui/material';
+
+const DarkPaper = styled(Paper)({
+  backgroundColor: '#333',
+  color: '#fff',
+});
+
+const DarkTableCell = styled(TableCell)({
+  color: '#fff',
+});
+
+const DarkTableHead = styled(TableHead)({
+  backgroundColor: '#555',
+});
 
 const AppTable = () => {
   const [tasks, setTasks] = useState([]);
@@ -34,24 +47,24 @@ const AppTable = () => {
   };
 
   return (
-    <Paper>
+    <DarkPaper>
       <TableContainer>
         <Table>
-          <TableHead>
+          <DarkTableHead>
             <TableRow>
-              <TableCell>Task Name</TableCell>
-              <TableCell align="right">CPU % (Total: {totalCpuUsage}%)</TableCell>
-              <TableCell align="right">GPU % (Total: {totalGpuUsage}%)</TableCell>
-              <TableCell align="right">Memory MB (Total: {totalMemUsage}%)</TableCell>
+              <DarkTableCell>Task Name</DarkTableCell>
+              <DarkTableCell align="right">CPU % (Total: {totalCpuUsage}%)</DarkTableCell>
+              <DarkTableCell align="right">GPU % (Total: {totalGpuUsage}%)</DarkTableCell>
+              <DarkTableCell align="right">Memory MB (Total: {totalMemUsage}%)</DarkTableCell>
             </TableRow>
-          </TableHead>
+          </DarkTableHead>
           <TableBody>
             {tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((task) => (
               <TableRow key={task.pid}>
-                <TableCell>{task.name}</TableCell>
-                <TableCell align="right">{task.cpu.toFixed(2)}</TableCell>
-                <TableCell align="right">{typeof task.gpu === 'number' ? task.gpu.toFixed(2) : task.gpu}</TableCell>
-                <TableCell align="right">{(task.mem / 1024 / 1024).toFixed(2)}</TableCell>
+                <DarkTableCell>{task.name}</DarkTableCell>
+                <DarkTableCell align="right">{task.cpu.toFixed(2)}</DarkTableCell>
+                <DarkTableCell align="right">{typeof task.gpu === 'number' ? task.gpu.toFixed(2) : task.gpu}</DarkTableCell>
+                <DarkTableCell align="right">{(task.mem / 1024 / 1024).toFixed(2)}</DarkTableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -66,7 +79,7 @@ const AppTable = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-    </Paper>
+    </DarkPaper>
   );
 };
 

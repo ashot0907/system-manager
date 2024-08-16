@@ -4,7 +4,6 @@ const cors = require('cors');
 const { exec } = require('child_process');
 const systeminformation = require('systeminformation'); // Import systeminformation
 
-
 const app = express();
 const port = 5000;
 
@@ -28,6 +27,64 @@ const getGpuInfo = () => {
     });
   });
 };
+
+// New endpoint for SystemInfo.js
+app.get('/api/system-info', async (req, res) => {
+  try {
+    const cpuData = await si.cpu();
+    const memory = await si.mem();
+    const fsSizes = await si.fsSize();
+    const networkInterfaces = await si.networkInterfaces();
+    const wifiInterface = networkInterfaces.find(iface => iface.iface.toLowerCase().includes('en') || iface.iface.toLowerCase().includes('wifi') || iface.iface.toLowerCase().includes('wl'));
+
+    const wifiDetails = wifiInterface ? {
+      ssid: wifiInterface.ssid || 'N/A',
+      mac: wifiInterface.mac || 'N/A',
+      speed: wifiInterface.speed || 'N/A'
+    } : { ssid: 'N/A', mac: 'N/A', speed: 'N/A' };
+
+    // Alternative method to get SSID (especially for macOS)
+    if (wifiDetails.ssid === 'N/A') {
+      exec('networksetup -getairportnetwork en0', (err, stdout) => {
+        if (!err && stdout) {
+          const ssidMatch = stdout.match(/Current Wi-Fi Network: (.*)/);
+          if (ssidMatch && ssidMatch[1]) {
+            wifiDetails.ssid = ssidMatch[1];
+          }
+        }
+
+        sendResponse();
+      });
+    } else {
+      sendResponse();
+    }
+
+    function sendResponse() {
+      const diskInfo = fsSizes.map(fs => ({
+        fs: fs.fs,
+        size: (fs.size / 1e9).toFixed(2), // Convert to GB
+        free: (fs.available / 1e9).toFixed(2), // Convert to GB
+        used: ((fs.size - fs.available) / 1e9).toFixed(2) // Convert to GB
+      }));
+
+      res.json({
+        cpuModel: `${cpuData.manufacturer} ${cpuData.brand}`,
+        gpuModel: 'N/A', // Adjust or update this as needed for GPU
+        memory: {
+          total: (memory.total / (1024 * 1024 * 1024)).toFixed(2), // Convert to GB
+          used: (memory.used / (1024 * 1024 * 1024)).toFixed(2), // Convert to GB
+          free: (memory.free / (1024 * 1024 * 1024)).toFixed(2)  // Convert to GB
+        },
+        disks: diskInfo,
+        ipAddresses: networkInterfaces.map(iface => iface.ip4).filter(ip => ip),
+        wifi: wifiDetails
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching system info:', error);
+    res.status(500).send(error.toString());
+  }
+});
 
 app.get('/api/system', async (req, res) => {
   try {
@@ -89,36 +146,6 @@ app.get('/api/system', async (req, res) => {
   }
 });
 
-
-
-// New route to handle terminal commands
-
-// let currentDirectory = process.cwd();
-
-// app.post('/api/execute', (req, res) => {
-//   let { command } = req.body;
-
-//   // Handle `cd` command
-//   if (command.startsWith('cd ')) {
-//     const newDir = command.slice(3).trim();
-//     try {
-//       process.chdir(newDir);
-//       currentDirectory = process.cwd();
-//       return res.json({ output: `Changed directory to ${currentDirectory}` });
-//     } catch (error) {
-//       return res.status(500).json({ error: `cd: ${newDir}: No such file or directory` });
-//     }
-//   }
-
-//   // Execute other commands in the current directory
-//   exec(command, { cwd: currentDirectory }, (error, stdout, stderr) => {
-//     if (error) {
-//       return res.status(500).json({ error: stderr });
-//     }
-//     res.json({ output: stdout });
-//   });
-// });
-
 app.get('/api/system-stats', async (req, res) => {
   try {
     // Get CPU temperature
@@ -156,9 +183,6 @@ app.get('/api/system-stats', async (req, res) => {
   }
 });
 
-
-
-
 let currentDirectory = process.cwd(); // Initialize with the current working directory
 
 app.post('/api/execute', (req, res) => {
@@ -185,7 +209,6 @@ app.post('/api/execute', (req, res) => {
   });
 });
 
-
 // Add this route to your existing server.js code
 app.get('/api/used-ports', (req, res) => {
   console.log('Received request for /api/used-ports');
@@ -211,7 +234,6 @@ app.get('/api/used-ports', (req, res) => {
   });
 });
 
-
 app.post('/api/stop-process', (req, res) => {
   const { pid } = req.body;
   if (!pid) {
@@ -225,8 +247,6 @@ app.post('/api/stop-process', (req, res) => {
       res.json({ success: true, message: `Process with PID ${pid} stopped successfully` });
   });
 });
-
-
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

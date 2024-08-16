@@ -33,9 +33,6 @@ const TaskManager = () => {
     <Container style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div className="dashboard">
         <div className="card">
-          <UsedPorts />
-        </div>
-        <div className="card">
           <AppTable />
         </div>
         <div className="card">
@@ -48,6 +45,9 @@ const TaskManager = () => {
           <TotalUsageDonuts memory={systemInfo.memory} />
         </div>
       </div>
+      <div className="card">
+          <UsedPorts />
+        </div>
     </Container>
   );
 };

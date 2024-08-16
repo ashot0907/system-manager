@@ -35,7 +35,7 @@ const TotalUsageDonuts = () => {
     labels: ['Used CPU %', 'Free CPU %'],
     datasets: [{
       data: [totalCpuUsage, 100 - totalCpuUsage],
-      backgroundColor: ['rgba(172, 255, 47, 0.21)', '#36A2EB'],
+      backgroundColor: ['rgba(172, 255, 47, 0.21)', 'rgba(75,192,192,0.7'],
     }],
   };
 
@@ -43,7 +43,7 @@ const TotalUsageDonuts = () => {
     labels: ['Used GPU %', 'Free GPU %'],
     datasets: [{
       data: totalGpuUsage !== 'N/A' ? [totalGpuUsage, 100 - totalGpuUsage] : [0, 100],
-      backgroundColor: ['#FF6384', '#36A2EB'],
+      backgroundColor: ['rgba(172, 255, 47, 0.21)', 'rgba(75,192,192,0.7'],
     }],
   };
 
@@ -51,7 +51,7 @@ const TotalUsageDonuts = () => {
     labels: ['Used Memory MB', 'Free Memory MB'],
     datasets: [{
       data: [memory.used / 1024 / 1024, memory.free / 1024 / 1024],
-      backgroundColor: ['#FF6384', '#36A2EB'],
+      backgroundColor: ['rgba(172, 255, 47, 0.21)', 'rgba(75,192,192,0.7'],
     }],
   };
 
@@ -59,15 +59,15 @@ const TotalUsageDonuts = () => {
     <div id="donuts">
       <div className="doughnut-chart">
         <h3>CPU Usage</h3>
-        <Doughnut data={cpuData} />
+        <Doughnut data={cpuData} width={250} height={250}/>
       </div>
       <div className="doughnut-chart">
         <h3>GPU Usage</h3>
-        <Doughnut data={gpuData} />
+        <Doughnut data={gpuData} width={250} height={250}/>
       </div>
       <div className="doughnut-chart">
         <h3>Memory Usage</h3>
-        <Doughnut data={memoryData} />
+        <Doughnut data={memoryData} width={250} height={250}/>
       </div>
     </div>
   );

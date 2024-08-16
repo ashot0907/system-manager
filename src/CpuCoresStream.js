@@ -10,7 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, styled } from '@mui/material';
 
 ChartJS.register(
   CategoryScale,
@@ -20,6 +20,19 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
+const DarkPaper = styled(Paper)({
+  backgroundColor: '#333',
+  color: '#fff',
+});
+
+const DarkTableCell = styled(TableCell)({
+  color: '#fff',
+});
+
+const DarkTableHead = styled(TableHead)({
+  backgroundColor: '#555',
+});
 
 const CpuCoresStream = () => {
   const [cpuCores, setCpuCores] = useState([]);
@@ -63,19 +76,19 @@ const CpuCoresStream = () => {
       <h3>CPU Cores Usage</h3>
       <Line data={chartData} />
       <h3></h3>
-      <TableContainer component={Paper}>
+      <TableContainer component={DarkPaper}>
         <Table>
-          <TableHead>
+          <DarkTableHead>
             <TableRow>
-              <TableCell>Process Name</TableCell>
-              <TableCell align="right">CPU Cores %</TableCell>
+              <DarkTableCell>Process Name</DarkTableCell>
+              <DarkTableCell align="right">CPU Cores %</DarkTableCell>
             </TableRow>
-          </TableHead>
+          </DarkTableHead>
           <TableBody>
             {processes.map((process) => (
               <TableRow key={process.pid}>
-                <TableCell>{process.name}</TableCell>
-                <TableCell align="right">{process.cpuCores.toFixed(2)}</TableCell>
+                <DarkTableCell>{process.name}</DarkTableCell>
+                <DarkTableCell align="right">{process.cpuCores.toFixed(2)}</DarkTableCell>
               </TableRow>
             ))}
           </TableBody>

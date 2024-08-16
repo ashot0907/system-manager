@@ -4,9 +4,11 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import TaskManager from './TaskManager';
 import FileSystem from './FileSystem';
 import Terminal from './Terminal';
+import SystemInfo from './SystemInfo';
 import terminalImg from './assets/terminal.png';
-import serverManagementImg from './assets/servermanagement.png';
-import monitorResourcesImg from './assets/monitorresorses.png';
+import monitorResourcesImg from './assets/servermanagement.png';
+import serverManagementImg from './assets/monitorresorses.png';
+import InfoIcon from './assets/infoIcon.png'; // Import the system info icon
 import './App.css';
 
 const theme = createTheme({
@@ -26,6 +28,7 @@ const theme = createTheme({
 const App = () => {
   const [terminals, setTerminals] = useState([]); // Array of terminal instances
   const [nextTerminalId, setNextTerminalId] = useState(1);
+  const [systemInfo, setSystemInfo] = useState({ isOpen: false, isFullscreen: false, isMinimized: false });
 
   const addTerminal = () => {
     setTerminals((prevTerminals) => [
@@ -71,6 +74,26 @@ const App = () => {
     );
   };
 
+  const openSystemInfo = () => {
+    setSystemInfo({ ...systemInfo, isOpen: true });
+  };
+
+  const closeSystemInfo = () => {
+    setSystemInfo({ isOpen: false, isFullscreen: false, isMinimized: false });
+  };
+
+  const minimizeSystemInfo = () => {
+    setSystemInfo({ ...systemInfo, isMinimized: true });
+  };
+
+  const restoreSystemInfo = () => {
+    setSystemInfo({ ...systemInfo, isMinimized: false });
+  };
+
+  const toggleSystemInfoFullscreen = () => {
+    setSystemInfo({ ...systemInfo, isFullscreen: !systemInfo.isFullscreen });
+  };
+
   const minimizedTerminals = terminals.filter((t) => t.isMinimized);
 
   return (
@@ -83,6 +106,7 @@ const App = () => {
           </Routes>
           <Navbar
             onTerminalClick={addTerminal}
+            onSystemInfoClick={openSystemInfo}
             minimizedTerminals={minimizedTerminals}
             restoreTerminal={restoreTerminal}
           />
@@ -104,13 +128,23 @@ const App = () => {
               </div>
             ) : null
           )}
+          {!systemInfo.isMinimized && systemInfo.isOpen && (
+            <div className={systemInfo.isFullscreen ? 'system-info-overlay fullscreen' : 'system-info-overlay'}>
+              <SystemInfo
+                onClose={closeSystemInfo}
+                onCollapse={minimizeSystemInfo}
+                onExpand={toggleSystemInfoFullscreen}
+                isFullscreen={systemInfo.isFullscreen}
+              />
+            </div>
+          )}
         </div>
       </Router>
     </ThemeProvider>
   );
 };
 
-const Navbar = ({ onTerminalClick, minimizedTerminals, restoreTerminal }) => {
+const Navbar = ({ onTerminalClick, onSystemInfoClick, minimizedTerminals, restoreTerminal }) => {
   const navigate = useNavigate();
 
   return (
@@ -123,6 +157,9 @@ const Navbar = ({ onTerminalClick, minimizedTerminals, restoreTerminal }) => {
       </button>
       <button id="btn" onClick={onTerminalClick}>
         <img src={terminalImg} alt="New Terminal" />
+      </button>
+      <button id="btn" onClick={onSystemInfoClick}>
+        <img src={InfoIcon} alt="System Info" /> {/* System Info button */}
       </button>
       {minimizedTerminals.length > 0 && <hr className="dock-divider" />}
       {minimizedTerminals.map((terminal) => (
