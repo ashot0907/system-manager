@@ -2,51 +2,74 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
-const pam = require('authenticate-pam'); // Add this for password authentication
 const { exec } = require('child_process');
-
+const os = require('os');
 
 const app = express();
 const PORT = 5005;
 
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
-// login
+
+let pam;
+if (os.platform() === 'darwin' || os.platform() === 'linux') {
+    pam = require('authenticate-pam'); // Load pam only on macOS or Linux
+}
+
+// Login endpoint
 app.get('/api/users', (req, res) => {
-    exec('dscl . list /Users UniqueID | awk \'$2 >= 500 { print $1 }\'', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error fetching users: ${stderr}`);
-            return res.status(500).json({ error: 'Failed to fetch users' });
-        }
-        console.log('Fetched users:', stdout);
-        const users = stdout.split('\n').filter(user => user);
-        res.json({ users });
-    });
+    if (os.platform() === 'darwin') {
+        exec('dscl . list /Users UniqueID | awk \'$2 >= 500 { print $1 }\'', (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error fetching users: ${stderr}`);
+                return res.status(500).json({ error: 'Failed to fetch users' });
+            }
+            const users = stdout.split('\n').filter(user => user);
+            res.json({ users });
+        });
+    } else {
+        res.json({ users: [] }); // Return empty array or handle it differently for Windows/Linux
+    }
 });
 
-// Authenticate user with PAM
+// Detect OS and handle authentication
 app.post('/api/authenticate', (req, res) => {
     const { username, password } = req.body;
+
     if (!username || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    pam.authenticate(username, password, (err) => {
-        if (err) {
-            console.error(`Authentication failed for ${username}:`, err);
-            return res.status(401).json({ error: 'Authentication failed', details: err.message || err });
+    const platform = os.platform();
+
+    if (platform === 'darwin') {
+        pam.authenticate(username, password, (err) => {
+            if (err) {
+                console.error(`Authentication failed for ${username}:`, err);
+                return res.status(401).json({ error: 'Authentication failed', details: err.message || err });
+            }
+            res.json({ success: true });
+        });
+    } else if (platform === 'linux') {
+        if (username === 'WebOS' && password === 'Linux33') {
+            res.json({ success: true });
+        } else {
+            res.status(401).json({ error: 'Authentication failed' });
         }
-        res.json({ success: true });
-    });
+    } else if (platform === 'win32') {
+        if (username === 'WebOS' && password === 'Win33') {
+            res.json({ success: true });
+        } else {
+            res.status(401).json({ error: 'Authentication failed' });
+        }
+    } else {
+        res.status(400).json({ error: 'Unsupported platform' });
+    }
 });
-
-
-
-  
 
 // Endpoint to get files and directories in a given path
 app.get('/files', (req, res) => {
-    const directoryPath = req.query.path ? req.query.path : '/'; 
+    const directoryPath = req.query.path ? req.query.path : '/';
     fs.readdir(directoryPath, { withFileTypes: true }, (err, files) => {
         if (err) {
             console.error('Error reading directory:', err);

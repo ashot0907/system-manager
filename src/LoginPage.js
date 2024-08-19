@@ -9,6 +9,7 @@ const LoginPage = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isEditable, setIsEditable] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -19,6 +20,12 @@ const LoginPage = () => {
         console.error('Error fetching users:', error);
         setError('Failed to fetch users');
       });
+
+    // Detect OS and set the input field to editable for Windows and Linux
+    const platform = window.navigator.platform.toLowerCase();
+    if (platform.includes('win') || platform.includes('linux')) {
+      setIsEditable(true);
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -45,13 +52,22 @@ const LoginPage = () => {
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit}>
-        <h2>Select User</h2>
-        <select value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
-          <option value="">-- Select a user --</option>
-          {users.map((user, index) => (
-            <option key={index} value={user}>{user}</option>
-          ))}
-        </select>
+        <h2>{isEditable ? 'Enter Username' : 'Select User'}</h2>
+        {isEditable ? (
+          <input
+            type="text"
+            value={selectedUser}
+            onChange={(e) => setSelectedUser(e.target.value)}
+            placeholder="Enter username"
+          />
+        ) : (
+          <select value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
+            <option value="">-- Select a user --</option>
+            {users.map((user, index) => (
+              <option key={index} value={user}>{user}</option>
+            ))}
+          </select>
+        )}
 
         {selectedUser && (
           <div className="password-input">
