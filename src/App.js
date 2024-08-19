@@ -12,6 +12,7 @@ import terminalImg from './assets/terminal.png';
 import monitorResourcesImg from './assets/servermanagement.png';
 import serverManagementImg from './assets/monitorresorses.png';
 import InfoIcon from './assets/infoIcon.png';
+import TopBar from './TopBar'; // Import TopBar component
 import './App.css';
 
 const theme = createTheme({
@@ -116,6 +117,7 @@ const AppContent = () => {
 
   return (
     <div id="main">
+      {isAuthenticated && <TopBar />} {/* Add TopBar here */}
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/file-system" element={<ProtectedRoute component={FileSystem} />} />
