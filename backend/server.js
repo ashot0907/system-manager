@@ -14,9 +14,15 @@ app.use(express.json());
 // Function to get GPU Information
 const getGpuInfo = async () => {
     const gpuData = await si.graphics();
+
+    // Check if gpuData or controllers exist and are an array
+    if (!gpuData || !Array.isArray(gpuData.controllers) || gpuData.controllers.length === 0) {
+        return [{ model: 'No GPU Found', usage: 0 }];
+    }
+
     return gpuData.controllers.map(controller => ({
         model: controller.model || 'N/A',
-        usage: controller.utilizationGpu || 0,
+        usage: controller.utilizationGpu !== undefined ? controller.utilizationGpu : 0, // Safe access to utilizationGpu
     }));
 };
 
@@ -228,9 +234,9 @@ app.get('/api/used-ports', (req, res) => {
     let command;
 
     if (platform === 'win32') {
-        command = 'netstat -ano'; // Windows equivalent to check ports
+        command = 'netstat -ano'; 
     } else {
-        command = 'lsof -iTCP -sTCP:LISTEN -n -P'; // macOS/Linux
+        command = 'lsof -iTCP -sTCP:LISTEN -n -P';
     }
 
     exec(command, (error, stdout, stderr) => {
@@ -246,7 +252,7 @@ app.get('/api/used-ports', (req, res) => {
                 const parts = line.trim().split(/\s+/);
                 const [protocol, localAddress, , pid] = parts;
                 const [address, port] = localAddress.split(':');
-                const user = 'N/A'; // Windows netstat doesn't provide user info
+                const user = 'N/A'; 
                 return {
                     user,
                     port,

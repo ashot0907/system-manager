@@ -13,7 +13,7 @@ app.use(express.json());
 
 let pam;
 if (os.platform() === 'darwin' || os.platform() === 'linux') {
-    pam = require('authenticate-pam'); // Load pam only on macOS or Linux
+    pam = require('authenticate-pam');
 }
 
 // Login endpoint
@@ -28,7 +28,7 @@ app.get('/api/users', (req, res) => {
             res.json({ users });
         });
     } else {
-        res.json({ users: [] }); // Return empty array or handle it differently for Windows/Linux
+        res.json({ users: [] });
     }
 });
 
@@ -151,7 +151,7 @@ app.post('/files/rename', (req, res) => {
 app.post('/files/delete', (req, res) => {
     const { path: targetPath } = req.body;
     const isDirectory = fs.lstatSync(targetPath).isDirectory();
-    
+
     if (isDirectory) {
         fs.rmdir(targetPath, { recursive: true }, (err) => {
             if (err) {
