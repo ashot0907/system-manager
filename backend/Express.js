@@ -16,56 +16,8 @@ if (os.platform() === 'darwin' || os.platform() === 'linux') {
     pam = require('authenticate-pam');
 }
 
-// Login endpoint
-app.get('/api/users', (req, res) => {
-    if (os.platform() === 'darwin') {
-        exec('dscl . list /Users UniqueID | awk \'$2 >= 500 { print $1 }\'', (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error fetching users: ${stderr}`);
-                return res.status(500).json({ error: 'Failed to fetch users' });
-            }
-            const users = stdout.split('\n').filter(user => user);
-            res.json({ users });
-        });
-    } else {
-        res.json({ users: [] });
-    }
-});
 
-// Detect OS and handle authentication
-app.post('/api/authenticate', (req, res) => {
-    const { username, password } = req.body;
 
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
-    }
-
-    const platform = os.platform();
-
-    if (platform === 'darwin') {
-        pam.authenticate(username, password, (err) => {
-            if (err) {
-                console.error(`Authentication failed for ${username}:`, err);
-                return res.status(401).json({ error: 'Authentication failed', details: err.message || err });
-            }
-            res.json({ success: true });
-        });
-    } else if (platform === 'linux') {
-        if (username === 'WebOS' && password === 'Linux33') {
-            res.json({ success: true });
-        } else {
-            res.status(401).json({ error: 'Authentication failed' });
-        }
-    } else if (platform === 'win32') {
-        if (username === 'WebOS' && password === 'Win33') {
-            res.json({ success: true });
-        } else {
-            res.status(401).json({ error: 'Authentication failed' });
-        }
-    } else {
-        res.status(400).json({ error: 'Unsupported platform' });
-    }
-});
 
 // Endpoint to get files and directories in a given path
 app.get('/files', (req, res) => {

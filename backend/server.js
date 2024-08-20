@@ -202,30 +202,14 @@ app.post('/api/authenticate', (req, res) => {
         return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    const platform = os.platform();
-
-    if (platform === 'darwin') { // For macOS users
-        if (username === 'WebOS' && password === 'Mac33') {
-            res.json({ success: true });
-        } else {
-            res.status(401).json({ error: 'Authentication failed' });
-        }
-    } else if (platform === 'linux') {
-        if (username === 'WebOS' && password === 'Linux33') {
-            res.json({ success: true });
-        } else {
-            res.status(401).json({ error: 'Authentication failed' });
-        }
-    } else if (platform === 'win32') {
-        if (username === 'WebOS' && password === 'Win33') {
-            res.json({ success: true });
-        } else {
-            res.status(401).json({ error: 'Authentication failed' });
-        }
+    if (username === 'Web' && password === 'Web33') {
+        res.json({ success: true });
     } else {
-        res.status(400).json({ error: 'Unsupported platform' });
+        res.status(401).json({ error: 'Authentication failed' });
     }
 });
+
+
 
 
 app.get('/api/used-ports', (req, res) => {

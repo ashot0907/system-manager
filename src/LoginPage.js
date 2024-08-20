@@ -1,37 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import './LoginPage.css';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isEditable, setIsEditable] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
-
-  useEffect(() => {
-    // Detect OS and set the input fields for Windows, Linux, or macOS
-    const platform = window.navigator.platform.toLowerCase();
-    
-    // Check if the OS is macOS, Windows, or Linux and set logic accordingly
-    if (platform.includes('mac')) {
-      // For macOS, preset the credentials
-      setUsername('WebOS');
-      setPassword('Mac33');
-      setIsEditable(false); // Disable editing for macOS users
-    } else if (platform.includes('win') || platform.includes('linux')) {
-      setIsEditable(true); // Enable input for username and password
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Default username
+    const username = 'Web';
+
     try {
-      const response = await axios.post('http://localhost:5005/api/authenticate', {
+      const response = await axios.post('http://localhost:5000/api/authenticate', {
         username,
         password
       });
@@ -51,37 +37,26 @@ const LoginPage = () => {
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit}>
-        <h2>{isEditable ? 'Enter Username' : 'Login'}</h2>
+        <h2>Login</h2>
         
-        {isEditable ? (
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter username"
-          />
-        ) : (
-          <input
-            type="text"
-            value={username}
-            readOnly // Disable input for macOS users
-          />
-        )}
-
+        <input
+          type="text"
+          value="Web" // Display default username, fixed value
+          readOnly // Username is fixed
+        />
+        
         <div className="password-input">
           <label>Password:</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder={isEditable ? "Enter password" : ""}
-            readOnly={!isEditable} // Disable password input for macOS
           />
         </div>
 
         {error && <div className="error">{error}</div>}
 
-        <button type="submit" disabled={!username}>Login</button>
+        <button type="submit">Login</button>
       </form>
     </div>
   );
