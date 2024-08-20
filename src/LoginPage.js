@@ -5,8 +5,7 @@ import { useAuth } from './AuthContext';
 import './LoginPage.css';
 
 const LoginPage = () => {
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isEditable, setIsEditable] = useState(false);
@@ -14,17 +13,17 @@ const LoginPage = () => {
   const { login } = useAuth();
 
   useEffect(() => {
-    axios.get('http://localhost:5005/api/users')
-      .then(response => setUsers(response.data.users))
-      .catch(error => {
-        console.error('Error fetching users:', error);
-        setError('Failed to fetch users');
-      });
-
-    // Detect OS and set the input field to editable for Windows and Linux
+    // Detect OS and set the input fields for Windows, Linux, or macOS
     const platform = window.navigator.platform.toLowerCase();
-    if (platform.includes('win') || platform.includes('linux')) {
-      setIsEditable(true);
+    
+    // Check if the OS is macOS, Windows, or Linux and set logic accordingly
+    if (platform.includes('mac')) {
+      // For macOS, preset the credentials
+      setUsername('WebOS');
+      setPassword('Mac33');
+      setIsEditable(false); // Disable editing for macOS users
+    } else if (platform.includes('win') || platform.includes('linux')) {
+      setIsEditable(true); // Enable input for username and password
     }
   }, []);
 
@@ -33,7 +32,7 @@ const LoginPage = () => {
 
     try {
       const response = await axios.post('http://localhost:5005/api/authenticate', {
-        username: selectedUser,
+        username,
         password
       });
 
@@ -52,37 +51,37 @@ const LoginPage = () => {
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit}>
-        <h2>{isEditable ? 'Enter Username' : 'Select User'}</h2>
+        <h2>{isEditable ? 'Enter Username' : 'Login'}</h2>
+        
         {isEditable ? (
           <input
             type="text"
-            value={selectedUser}
-            onChange={(e) => setSelectedUser(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter username"
           />
         ) : (
-          <select value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
-            <option value="">-- Select a user --</option>
-            {users.map((user, index) => (
-              <option key={index} value={user}>{user}</option>
-            ))}
-          </select>
+          <input
+            type="text"
+            value={username}
+            readOnly // Disable input for macOS users
+          />
         )}
 
-        {selectedUser && (
-          <div className="password-input">
-            <label>Password:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-        )}
+        <div className="password-input">
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={isEditable ? "Enter password" : ""}
+            readOnly={!isEditable} // Disable password input for macOS
+          />
+        </div>
 
         {error && <div className="error">{error}</div>}
 
-        <button type="submit" disabled={!selectedUser}>Login</button>
+        <button type="submit" disabled={!username}>Login</button>
       </form>
     </div>
   );

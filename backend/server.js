@@ -204,14 +204,12 @@ app.post('/api/authenticate', (req, res) => {
 
     const platform = os.platform();
 
-    if (platform === 'darwin') {
-        pam.authenticate(username, password, (err) => {
-            if (err) {
-                console.error(`Authentication failed for ${username}:`, err);
-                return res.status(401).json({ error: 'Authentication failed', details: err.message || err });
-            }
+    if (platform === 'darwin') { // For macOS users
+        if (username === 'WebOS' && password === 'Mac33') {
             res.json({ success: true });
-        });
+        } else {
+            res.status(401).json({ error: 'Authentication failed' });
+        }
     } else if (platform === 'linux') {
         if (username === 'WebOS' && password === 'Linux33') {
             res.json({ success: true });
@@ -228,6 +226,7 @@ app.post('/api/authenticate', (req, res) => {
         res.status(400).json({ error: 'Unsupported platform' });
     }
 });
+
 
 app.get('/api/used-ports', (req, res) => {
     const platform = os.platform();
