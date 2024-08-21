@@ -6,7 +6,6 @@ const { exec } = require('child_process');
 const os = require('os');
 const multer = require('multer');
 
-
 const app = express();
 const PORT = 5005;
 
@@ -17,7 +16,6 @@ let pam;
 if (os.platform() === 'darwin' || os.platform() === 'linux') {
     pam = require('authenticate-pam');
 }
-
 
 
 
@@ -127,20 +125,27 @@ app.post('/files/delete', (req, res) => {
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = path.join(__dirname, 'uploads');
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath);
+        const directoryPath = req.headers['directory-path'];
+        console.log('Received directory path:', directoryPath);
+
+        if (!directoryPath || !fs.existsSync(directoryPath)) {
+            console.error('Directory does not exist:', directoryPath);
+            return cb(new Error('Directory does not exist on the system'), false);
         }
-        cb(null, uploadPath);
+
+        cb(null, directoryPath);
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
+        console.log('Saving file:', file.originalname);
+        cb(null, file.originalname);
     }
 });
+
 
 const upload = multer({ storage: storage });
 
 app.post('/upload', upload.array('files'), (req, res) => {
+    console.log('Files uploaded successfully');
     res.send({ message: 'Files uploaded successfully!' });
 });
 

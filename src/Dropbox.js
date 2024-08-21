@@ -6,26 +6,39 @@ const Dropbox = () => {
 
     const handleFileDrop = (e) => {
         e.preventDefault();
-        const droppedFiles = Array.from(e.dataTransfer.files);
-        setFiles(droppedFiles);
-        uploadFiles(droppedFiles);
+        const droppedFiles = Array.from(e.dataTransfer.items);
+        const fileArray = [];
+
+        droppedFiles.forEach(item => {
+            if (item.kind === 'file') {
+                const file = item.getAsFile();
+                fileArray.push(file);
+            }
+        });
+
+        setFiles(fileArray);
+        uploadFiles(fileArray);
     };
 
     const uploadFiles = async (files) => {
         const formData = new FormData();
         files.forEach(file => {
-            formData.append('files', file);
+            formData.append('files', file, file.webkitRelativePath || file.name);
         });
+
+        const pwd = document.querySelector('.pwd-display').textContent.trim();
+        console.log('Uploading to path:', pwd);
 
         try {
             const response = await axios.post('http://localhost:5005/upload', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'directory-path': pwd, // Send the path to the backend
                 }
             });
-            console.log(response.data.message);
+            console.log('Upload successful:', response.data.message);
         } catch (error) {
-            console.error('Error uploading files:', error);
+            console.error('Error uploading files:', error.message);
         }
     };
 
