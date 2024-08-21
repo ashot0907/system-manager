@@ -4,6 +4,8 @@ const path = require('path');
 const cors = require('cors');
 const { exec } = require('child_process');
 const os = require('os');
+const multer = require('multer');
+
 
 const app = express();
 const PORT = 5005;
@@ -122,6 +124,26 @@ app.post('/files/delete', (req, res) => {
         });
     }
 });
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadPath = path.join(__dirname, 'uploads');
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath);
+        }
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+app.post('/upload', upload.array('files'), (req, res) => {
+    res.send({ message: 'Files uploaded successfully!' });
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

@@ -14,6 +14,7 @@ import serverManagementImg from './assets/monitorresorses.png';
 import InfoIcon from './assets/infoIcon.png';
 import TopBar from './TopBar'; // Import TopBar component
 import './App.css';
+import Dropbox from './Dropbox';
 
 const theme = createTheme({
   palette: {
@@ -197,6 +198,7 @@ const App = () => (
     <Router>
       <AuthProvider>
         <AppContent />
+        <Dropbox />
       </AuthProvider>
     </Router>
   </ThemeProvider>
