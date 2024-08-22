@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import TaskManager from './TaskManager';
 import FileSystem from './FileSystem';
@@ -12,7 +12,8 @@ import terminalImg from './assets/terminal.png';
 import monitorResourcesImg from './assets/servermanagement.png';
 import serverManagementImg from './assets/monitorresorses.png';
 import InfoIcon from './assets/infoIcon.png';
-import TopBar from './TopBar'; // Import TopBar component
+import DropboxImg from './assets/Dropbox.png'; // Import Dropbox image
+import TopBar from './TopBar';
 import './App.css';
 import Dropbox from './Dropbox';
 
@@ -35,7 +36,9 @@ const AppContent = () => {
   const [terminals, setTerminals] = useState([]);
   const [nextTerminalId, setNextTerminalId] = useState(1);
   const [systemInfo, setSystemInfo] = useState({ isOpen: false, isFullscreen: false, isMinimized: false });
+  const [isDropboxVisible, setDropboxVisible] = useState(false); // State to control Dropbox visibility
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -116,6 +119,10 @@ const AppContent = () => {
 
   const minimizedTerminals = terminals.filter((t) => t.isMinimized);
 
+  const toggleDropboxVisibility = () => {
+    setDropboxVisible((prevVisible) => !prevVisible);
+  };
+
   return (
     <div id="main">
       {isAuthenticated && <TopBar />} {/* Add TopBar here */}
@@ -129,6 +136,7 @@ const AppContent = () => {
           <Navbar
             onTerminalClick={addTerminal}
             onSystemInfoClick={openSystemInfo}
+            onDropboxClick={toggleDropboxVisibility} // Add the Dropbox toggle function to Navbar
             minimizedTerminals={minimizedTerminals}
             restoreTerminal={restoreTerminal}
           />
@@ -160,13 +168,14 @@ const AppContent = () => {
               />
             </div>
           )}
+          {isDropboxVisible && location.pathname !== '/task-manager' && <Dropbox />}
         </>
       )}
     </div>
   );
 };
 
-const Navbar = ({ onTerminalClick, onSystemInfoClick, minimizedTerminals, restoreTerminal }) => {
+const Navbar = ({ onTerminalClick, onSystemInfoClick, onDropboxClick, minimizedTerminals, restoreTerminal }) => {
   const navigate = useNavigate();
 
   return (
@@ -183,6 +192,9 @@ const Navbar = ({ onTerminalClick, onSystemInfoClick, minimizedTerminals, restor
       <button id="btn" onClick={onSystemInfoClick}>
         <img src={InfoIcon} alt="System Info" />
       </button>
+      <button id="btn" onClick={onDropboxClick}>
+        <img src={DropboxImg} alt="Toggle Dropbox" />
+      </button>
       {minimizedTerminals.length > 0 && <hr className="dock-divider" />}
       {minimizedTerminals.map((terminal) => (
         <button key={terminal.id} id="btn" onClick={() => restoreTerminal(terminal.id)}>
@@ -198,7 +210,6 @@ const App = () => (
     <Router>
       <AuthProvider>
         <AppContent />
-        <Dropbox />
       </AuthProvider>
     </Router>
   </ThemeProvider>
