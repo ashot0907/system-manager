@@ -3,7 +3,7 @@
     width: 300px;
     margin: 100px auto;
     padding: 20px;
-    background-color: #333;
+    background-color: #040810 !important;
     color: #fff;
     border-radius: 8px;
   }
@@ -30,11 +30,16 @@
   button {
     width: 100%;
     padding: 10px;
-    background-color: #555;
-    color: #fff;
+    /* background-color: #545a6b !important; */
+    /* color: #ffffff !important; */
     border: none;
     border-radius: 5px;
     cursor: pointer;
+  }
+
+  #btne{
+    background-color: #545a6b !important;
+    color: #ffffff !important;
   }
   
   button:disabled {

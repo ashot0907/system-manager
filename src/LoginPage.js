@@ -5,6 +5,7 @@ import { useAuth } from './AuthContext';
 import { Button, TextField, Typography, Container, Paper, Box } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './LoginPage.css';
+import loginLogo from './assets/loginlogo.png'; // Importing the image
 
 const darkTheme = createTheme({
   palette: {
@@ -31,7 +32,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const username = 'Web';
+    const username = 'Web'; // Username is handled directly here
 
     try {
       const response = await axios.post('http://localhost:5000/api/authenticate', {
@@ -57,17 +58,11 @@ const LoginPage = () => {
         <Paper elevation={6} className="login-container">
           <Box p={3}>
             <form onSubmit={handleSubmit}>
-              <Typography variant="h5" align="center" gutterBottom>
-                Login
-              </Typography>
+              <Box display="flex" justifyContent="center" mb={0}>
+                <img src={loginLogo} alt="Login Logo" style={{ width:'300px', height: 'auto' }} />
+              </Box>
 
-              <TextField
-                label="Username"
-                value="Web"
-                InputProps={{ readOnly: true }}
-                fullWidth
-                margin="normal"
-              />
+        
 
               <TextField
                 label="Password"
@@ -81,7 +76,7 @@ const LoginPage = () => {
               {error && <Typography color="error" align="center">{error}</Typography>}
 
               <Box mt={2}>
-                <Button
+                <Button id='btne'
                   type="submit"
                   variant="contained"
                   color="primary"
