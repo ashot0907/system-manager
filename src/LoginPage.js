@@ -35,7 +35,7 @@ const LoginPage = () => {
     const username = 'Web'; // Username is handled directly here
 
     try {
-      const response = await axios.post('http://localhost:5000/api/authenticate', {
+      const response = await axios.post('http://0.0.0.0:5000/api/authenticate', {
         username,
         password
       });

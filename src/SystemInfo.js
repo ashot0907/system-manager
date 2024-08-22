@@ -10,7 +10,7 @@ const SystemInfo = ({ onClose, onCollapse, onExpand, isFullscreen }) => {
 
   useEffect(() => {
     // Fetch system information
-    fetch('http://localhost:5000/api/system-info')
+    fetch('http://0.0.0.0:5000/api/system-info')
       .then(response => response.json())
       .then(data => {
         // Set the data directly without any conversion

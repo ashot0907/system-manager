@@ -18,7 +18,7 @@ const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initia
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/execute', { command });
+      const response = await axios.post('http://0.0.0.0:5000/api/execute', { command });
       const newOutput = `${output}\n${command}\n${response.data.output}`;
       setOutput(newOutput);
       updateState('', newOutput);

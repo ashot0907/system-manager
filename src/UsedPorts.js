@@ -10,7 +10,7 @@ const UsedPorts = () => {
     }, []);
 
     const fetchPortsData = () => {
-        axios.get('http://localhost:5000/api/used-ports')
+        axios.get('http://0.0.0.0:5000/api/used-ports')
             .then(response => setPortsData(response.data))
             .catch(error => {
                 console.error('Error fetching ports data:', error);
@@ -20,7 +20,7 @@ const UsedPorts = () => {
     };
 
     const stopProcess = (pid) => {
-        axios.post('http://localhost:5000/api/stop-process', { pid })
+        axios.post('http://0.0.0.0:5000/api/stop-process', { pid })
             .then(response => {
                 alert(`Process with PID ${pid} stopped successfully`);
                 fetchPortsData(); // Refresh data after stopping process

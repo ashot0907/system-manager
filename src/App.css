@@ -25,7 +25,7 @@ body {
   border-radius: 20px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   position: fixed;
-  top: 6px; /* Keep the dock at the top of the screen */
+  top: 3px; /* Keep the dock at the top of the screen */
   left: 50%;
   transform: translateX(-50%);
   width: auto;

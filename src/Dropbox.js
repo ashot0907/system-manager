@@ -30,7 +30,7 @@ const Dropbox = () => {
         console.log('Uploading to path:', pwd);
 
         try {
-            const response = await axios.post('http://localhost:5005/upload', formData, {
+            const response = await axios.post('http://0.0.0.0:5005/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'directory-path': pwd, // Send the path to the backend
