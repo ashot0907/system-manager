@@ -20,6 +20,12 @@ const Dropbox = () => {
         uploadFiles(fileArray);
     };
 
+    const handleFileSelect = (e) => {
+        const selectedFiles = Array.from(e.target.files);
+        setFiles(selectedFiles);
+        uploadFiles(selectedFiles);
+    };
+
     const uploadFiles = async (files) => {
         const formData = new FormData();
         files.forEach(file => {
@@ -51,11 +57,22 @@ const Dropbox = () => {
                 borderRadius: '4px',
                 padding: '20px',
                 textAlign: 'center',
-                color: '#555',
+                color: 'white',
                 cursor: 'pointer'
             }}
         >
-            <p>Drop files or folders here to upload</p>
+            <button onClick={() => document.getElementById('fileInput').click()} style={{background:'none', color:'white'}}>
+            <p>Drop files or folders here to upload or</p>
+            <input
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+                id="fileInput"
+            />
+            
+                Choose Files
+            </button>
         </div>
     );
 };
