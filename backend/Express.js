@@ -5,6 +5,8 @@ const cors = require('cors');
 const { exec } = require('child_process');
 const os = require('os');
 const multer = require('multer');
+const archiver = require('archiver');
+const unzipper = require('unzipper');
 
 const app = express();
 const PORT = 5005;
@@ -148,6 +150,36 @@ app.post('/upload', upload.array('files'), (req, res) => {
     console.log('Files uploaded successfully');
     res.send({ message: 'Files uploaded successfully!' });
 });
+
+app.post('/files/unzip', (req, res) => {
+    const filePath = req.body.path;
+    fs.createReadStream(filePath)
+        .pipe(unzipper.Extract({ path: path.dirname(filePath) }))
+        .on('close', () => res.sendStatus(200))
+        .on('error', (err) => res.status(500).send('Error unzipping file: ' + err.message));
+});
+
+// Endpoint to download a file or folder
+app.get('/files/download', (req, res) => {
+    const filePath = req.query.path;
+    if (fs.statSync(filePath).isDirectory()) {
+        const zipPath = path.join(path.dirname(filePath), path.basename(filePath) + '.zip');
+        const output = fs.createWriteStream(zipPath);
+        const archive = archiver('zip');
+
+        output.on('close', () => {
+            res.download(zipPath, () => fs.unlinkSync(zipPath));
+        });
+        archive.on('error', (err) => res.status(500).send('Error zipping folder: ' + err.message));
+
+        archive.pipe(output);
+        archive.directory(filePath, false);
+        archive.finalize();
+    } else {
+        res.download(filePath);
+    }
+});
+
 
 
 app.listen(PORT, () => {

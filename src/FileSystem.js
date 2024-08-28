@@ -164,6 +164,35 @@ function FileSystem() {
         }
     };
 
+    const handleUnzip = () => {
+        if (contextMenu && contextMenu.file) {
+            fetch(`http://0.0.0.0:5005/files/unzip`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ path: contextMenu.file.path }),
+            })
+                .then(() => {
+                    setContextMenu(null);
+                    setCurrentPath(currentPath);
+                })
+                .catch(error => console.error('Error unzipping file:', error));
+        }
+    };
+
+    const handleDownload = () => {
+        if (contextMenu && contextMenu.file) {
+            const downloadLink = document.createElement('a');
+            downloadLink.href = `http://0.0.0.0:5005/files/download?path=${encodeURIComponent(contextMenu.file.path)}`;
+            downloadLink.download = contextMenu.file.name;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            setContextMenu(null);
+        }
+    };
+
     return (
         <div className="desktop" onContextMenu={handleContextMenu}>
             <div className="pwd-display" style={{ position: 'absolute', top: '10px', left: '20px' }}>{currentPath}</div>
@@ -219,6 +248,8 @@ function FileSystem() {
                 <div className="context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
                     <button onClick={handleDelete}>Delete</button>
                     <button onClick={handleRename}>Rename</button>
+                    <button onClick={handleUnzip}>Unzip</button>
+                    <button onClick={handleDownload}>Download</button>
                 </div>
             )}
 
