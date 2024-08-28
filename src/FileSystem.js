@@ -9,6 +9,7 @@ function FileSystem() {
     const [fileContent, setFileContent] = useState('');
     const [contextMenu, setContextMenu] = useState(null);
     const [hoveredFile, setHoveredFile] = useState(null);
+    const [desktopMenu, setDesktopMenu] = useState(null);
 
     useEffect(() => {
         if (!selectedFile) {
@@ -22,12 +23,14 @@ function FileSystem() {
     const handleDirectoryClick = (path) => {
         setCurrentPath(path);
         setContextMenu(null);
+        setDesktopMenu(null);
     };
 
     const handleGoBack = () => {
         const newPath = currentPath.split('/').slice(0, -1).join('/') || '/';
         setCurrentPath(newPath);
         setContextMenu(null);
+        setDesktopMenu(null);
     };
 
     const handleFileClick = (file) => {
@@ -39,6 +42,7 @@ function FileSystem() {
             })
             .catch(error => console.error('Error fetching file content:', error));
         setContextMenu(null);
+        setDesktopMenu(null);
     };
 
     const handleSave = () => {
@@ -71,6 +75,13 @@ function FileSystem() {
                 y: event.clientY,
                 file: hoveredFile,
             });
+            setDesktopMenu(null);
+        } else {
+            setDesktopMenu({
+                x: event.clientX,
+                y: event.clientY,
+            });
+            setContextMenu(null);
         }
     };
 
@@ -114,6 +125,42 @@ function FileSystem() {
                     setCurrentPath(currentPath);
                 })
                 .catch(error => console.error('Error renaming file:', error));
+        }
+    };
+
+    const handleCreateFolder = () => {
+        const folderName = prompt('Enter the folder name:');
+        if (folderName) {
+            fetch(`http://0.0.0.0:5005/files/create-folder`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ path: currentPath, folderName }),
+            })
+                .then(() => {
+                    setDesktopMenu(null);
+                    setCurrentPath(currentPath);
+                })
+                .catch(error => console.error('Error creating folder:', error));
+        }
+    };
+
+    const handleCreateTextFile = () => {
+        const fileName = prompt('Enter the file name (with .txt extension):');
+        if (fileName) {
+            fetch(`http://0.0.0.0:5005/files/create-text-file`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ path: currentPath, fileName }),
+            })
+                .then(() => {
+                    setDesktopMenu(null);
+                    setCurrentPath(currentPath);
+                })
+                .catch(error => console.error('Error creating text file:', error));
         }
     };
 
@@ -169,9 +216,16 @@ function FileSystem() {
             )}
 
             {contextMenu && (
-                <div className="context-menu" style={{ top: contextMenu.x, left: contextMenu.y }}>
+                <div className="context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
                     <button onClick={handleDelete}>Delete</button>
                     <button onClick={handleRename}>Rename</button>
+                </div>
+            )}
+
+            {desktopMenu && (
+                <div className="context-menu" style={{ top: desktopMenu.y, left: desktopMenu.x }}>
+                    <button onClick={handleCreateFolder}>Create Folder</button>
+                    <button onClick={handleCreateTextFile}>Create Text Document</button>
                 </div>
             )}
         </div>
