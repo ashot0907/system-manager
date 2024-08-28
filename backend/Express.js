@@ -14,12 +14,6 @@ const PORT = 5005;
 app.use(cors());
 app.use(express.json());
 
-let pam;
-if (os.platform() === 'darwin' || os.platform() === 'linux') {
-    pam = require('authenticate-pam');
-}
-
-
 
 // Endpoint to get files and directories in a given path
 app.get('/files', (req, res) => {
