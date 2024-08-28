@@ -8,7 +8,7 @@ function FileSystem() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileContent, setFileContent] = useState('');
     const [contextMenu, setContextMenu] = useState(null);
-    const [desktopMenu, setDesktopMenu] = useState(null);
+    const [hoveredFile, setHoveredFile] = useState(null);
 
     useEffect(() => {
         if (!selectedFile) {
@@ -22,14 +22,12 @@ function FileSystem() {
     const handleDirectoryClick = (path) => {
         setCurrentPath(path);
         setContextMenu(null);
-        setDesktopMenu(null);
     };
 
     const handleGoBack = () => {
         const newPath = currentPath.split('/').slice(0, -1).join('/') || '/';
         setCurrentPath(newPath);
         setContextMenu(null);
-        setDesktopMenu(null);
     };
 
     const handleFileClick = (file) => {
@@ -41,7 +39,6 @@ function FileSystem() {
             })
             .catch(error => console.error('Error fetching file content:', error));
         setContextMenu(null);
-        setDesktopMenu(null);
     };
 
     const handleSave = () => {
@@ -66,23 +63,23 @@ function FileSystem() {
             .catch(error => console.error('Error saving file:', error));
     };
 
-    const handleContextMenu = (event, file) => {
+    const handleContextMenu = (event) => {
         event.preventDefault();
-        setContextMenu({
-            x: event.clientX,
-            y: event.clientY,
-            file,
-        });
-        setDesktopMenu(null);
+        if (hoveredFile) {
+            setContextMenu({
+                x: event.clientX,
+                y: event.clientY,
+                file: hoveredFile,
+            });
+        }
     };
 
-    const handleDesktopContextMenu = (event) => {
-        event.preventDefault();
-        setDesktopMenu({
-            x: event.clientX,
-            y: event.clientY,
-        });
-        setContextMenu(null);
+    const handleMouseEnter = (file) => {
+        setHoveredFile(file);
+    };
+
+    const handleMouseLeave = () => {
+        setHoveredFile(null);
     };
 
     const handleDelete = () => {
@@ -96,7 +93,7 @@ function FileSystem() {
             })
                 .then(() => {
                     setContextMenu(null);
-                    setCurrentPath(currentPath); 
+                    setCurrentPath(currentPath);
                 })
                 .catch(error => console.error('Error deleting file:', error));
         }
@@ -120,45 +117,9 @@ function FileSystem() {
         }
     };
 
-    const handleCreateFolder = () => {
-        const folderName = prompt('Enter the folder name:');
-        if (folderName) {
-            fetch(`http://0.0.0.0:5005/files/create-folder`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ path: currentPath, folderName }),
-            })
-                .then(() => {
-                    setDesktopMenu(null);
-                    setCurrentPath(currentPath); 
-                })
-                .catch(error => console.error('Error creating folder:', error));
-        }
-    };
-
-    const handleCreateTextFile = () => {
-        const fileName = prompt('Enter the file name (with .txt extension):');
-        if (fileName) {
-            fetch(`http://0.0.0.0:5005/files/create-text-file`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ path: currentPath, fileName }),
-            })
-                .then(() => {
-                    setDesktopMenu(null);
-                    setCurrentPath(currentPath); 
-                })
-                .catch(error => console.error('Error creating text file:', error));
-        }
-    };
-
     return (
-        <div className="desktop" onContextMenu={handleDesktopContextMenu}>
-            <div className="pwd-display" style={{position: 'absolute', top: '10px', left: '20px'}}>{currentPath}</div>
+        <div className="desktop" onContextMenu={handleContextMenu}>
+            <div className="pwd-display" style={{ position: 'absolute', top: '10px', left: '20px' }}>{currentPath}</div>
 
             {selectedFile ? (
                 <div className="editor-container">
@@ -187,13 +148,19 @@ function FileSystem() {
             ) : (
                 <>
                     {currentPath !== '/' && (
-                        <div className="file-icon" onClick={handleGoBack} onContextMenu={(e) => handleContextMenu(e, null)}>
+                        <div className="file-icon" onClick={handleGoBack} onMouseEnter={() => handleMouseEnter(null)} onMouseLeave={handleMouseLeave}>
                             <img src="/imgs/gobackdir.png" alt="folder icon" />
                             <p>..</p>
                         </div>
                     )}
                     {files.map((file, index) => (
-                        <div key={index} className="file-icon" onClick={() => file.isDirectory ? handleDirectoryClick(file.path) : handleFileClick(file)} onContextMenu={(e) => handleContextMenu(e, file)}>
+                        <div
+                            key={index}
+                            className="file-icon"
+                            onClick={() => file.isDirectory ? handleDirectoryClick(file.path) : handleFileClick(file)}
+                            onMouseEnter={() => handleMouseEnter(file)}
+                            onMouseLeave={handleMouseLeave}
+                        >
                             <img src={file.isDirectory ? "/imgs/folder.png" : "/imgs/file.png"} alt={file.isDirectory ? "folder icon" : "file icon"} />
                             <p>{file.name}</p>
                         </div>
@@ -202,16 +169,9 @@ function FileSystem() {
             )}
 
             {contextMenu && (
-                <div className="context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
+                <div className="context-menu" style={{ top: contextMenu.x, left: contextMenu.y }}>
                     <button onClick={handleDelete}>Delete</button>
                     <button onClick={handleRename}>Rename</button>
-                </div>
-            )}
-
-            {desktopMenu && (
-                <div className="context-menu" style={{ top: desktopMenu.y, left: desktopMenu.x }}>
-                    <button onClick={handleCreateFolder}>Create Folder</button>
-                    <button onClick={handleCreateTextFile}>Create Text Document</button>
                 </div>
             )}
         </div>
