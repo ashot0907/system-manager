@@ -18,7 +18,7 @@ body {
 .dock {
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   padding: 10px;
   background: rgba(255, 255, 255, 0.043);
   backdrop-filter: blur(10px);
@@ -30,7 +30,7 @@ body {
   transform: translateX(-50%);
   width: auto;
   z-index: 1000;
-  height: 80px; /* Set height for the dock */
+  height: 50px; /* Set height for the dock */
 }
 
 
