@@ -52,6 +52,25 @@
   transform: translateY(0);
 }
 
+.brightness-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.brightness-control label {
+  color: white;
+  font-size: 14px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.brightness-control input[type='range'] {
+  width: 100%;
+  cursor: pointer;
+}
+
 .dropdown-button,
 .logout-button {
   display: flex;
@@ -75,4 +94,10 @@
 .logout-button {
   border-top: 1px solid #555;
   justify-content: space-between;
+}
+
+.brightness-control label,
+.dropdown-button,
+.logout-button {
+  padding-left: 10px; /* Align text */
 }

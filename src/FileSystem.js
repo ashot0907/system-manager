@@ -15,7 +15,23 @@ function FileSystem() {
         if (!selectedFile) {
             fetch(`http://0.0.0.0:5005/files?path=${encodeURIComponent(currentPath)}`)
                 .then(response => response.json())
-                .then(data => setFiles(data))
+                .then(data => {
+                    // Add Go Back button as the first item
+                    const goBackFolder = currentPath !== '/' ? {
+                        name: '..',
+                        isDirectory: true,
+                        path: currentPath.split('/').slice(0, -1).join('/') || '/'
+                    } : null;
+
+                    const initialFiles = (goBackFolder ? [goBackFolder, ...data] : data).map((file, index) => ({
+                        ...file,
+                        position: {
+                            x: (index % 5) * 120 + 20, // 120px horizontal gap
+                            y: Math.floor(index / 5) * 120 + 20, // 120px vertical gap
+                        }
+                    }));
+                    setFiles(initialFiles);
+                })
                 .catch(error => console.error('Error fetching files:', error));
         }
     }, [currentPath, selectedFile]);
@@ -193,8 +209,26 @@ function FileSystem() {
         }
     };
 
+    const handleDragStart = (event, index) => {
+        event.dataTransfer.setData('index', index);
+    };
+
+    const handleDrop = (event) => {
+        const index = event.dataTransfer.getData('index');
+        const newFiles = [...files];
+        newFiles[index].position = {
+            x: event.clientX - 30, // Center the icon at the mouse position
+            y: event.clientY - 30,
+        };
+        setFiles(newFiles);
+    };
+
+    const handleDragOver = (event) => {
+        event.preventDefault(); // Necessary to allow a drop
+    };
+
     return (
-        <div className="desktop" onContextMenu={handleContextMenu}>
+        <div className="desktop" onContextMenu={handleContextMenu} onDrop={handleDrop} onDragOver={handleDragOver}>
             <div className="pwd-display" style={{ position: 'absolute', top: '10px', left: '20px' }}>{currentPath}</div>
 
             {selectedFile ? (
@@ -223,17 +257,18 @@ function FileSystem() {
                 </div>
             ) : (
                 <>
-                    {currentPath !== '/' && (
-                        <div className="file-icon" onClick={handleGoBack} onMouseEnter={() => handleMouseEnter(null)} onMouseLeave={handleMouseLeave}>
-                            <img src="/imgs/gobackdir.png" alt="folder icon" />
-                            <p>..</p>
-                        </div>
-                    )}
                     {files.map((file, index) => (
                         <div
                             key={index}
                             className="file-icon"
+                            style={{
+                                position: 'absolute',
+                                left: `${file.position.x}px`,
+                                top: `${file.position.y}px`,
+                            }}
                             onClick={() => file.isDirectory ? handleDirectoryClick(file.path) : handleFileClick(file)}
+                            draggable
+                            onDragStart={(event) => handleDragStart(event, index)}
                             onMouseEnter={() => handleMouseEnter(file)}
                             onMouseLeave={handleMouseLeave}
                         >
