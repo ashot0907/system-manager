@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { Button, TextField, Typography, Container, Paper, Box } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './LoginPage.css';
-import loginLogo from './assets/loginlogo.png'; // Importing the image
+import loginLogo from './assets/loginlogo.png';
 
 const darkTheme = createTheme({
   palette: {
@@ -32,23 +31,11 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const username = 'Web'; // Username is handled directly here
-
-    try {
-      const response = await axios.post('http://localhost:5000/api/authenticate', {
-        username,
-        password
-      });
-
-      if (response.data.success) {
-        login(); // Set authentication state
-        navigate('/file-system'); // Redirect after successful login
-      } else {
-        setError('Authentication failed');
-      }
-    } catch (err) {
+    const success = await login(password);
+    if (success) {
+      navigate('/file-system'); // Redirect after successful login
+    } else {
       setError('Authentication failed');
-      console.error('Authentication error:', err);
     }
   };
 
@@ -59,10 +46,8 @@ const LoginPage = () => {
           <Box p={3}>
             <form onSubmit={handleSubmit}>
               <Box display="flex" justifyContent="center" mb={0}>
-                <img src={loginLogo} alt="Login Logo" style={{ width:'300px', height: 'auto' }} />
+                <img src={loginLogo} alt="Login Logo" style={{ width: '300px', height: 'auto' }} />
               </Box>
-
-        
 
               <TextField
                 label="Password"
@@ -76,7 +61,7 @@ const LoginPage = () => {
               {error && <Typography color="error" align="center">{error}</Typography>}
 
               <Box mt={2}>
-                <Button id='btne'
+                <Button
                   type="submit"
                   variant="contained"
                   color="primary"

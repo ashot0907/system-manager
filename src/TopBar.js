@@ -3,7 +3,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import MenuIcon from '@mui/icons-material/Menu';
 import './TopBar.css';
-import SettingsComponent from './Settings'; // Import the SettingsComponent
+import SettingsComponent from './Settings'; 
+import { useAuth } from './AuthContext';
 
 const TopBar = () => {
   const [dateTime, setDateTime] = useState(new Date());
@@ -11,6 +12,7 @@ const TopBar = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [brightness, setBrightness] = useState(1);
   const dropdownRef = useRef(null);
+  const { logout } = useAuth();
 
   useEffect(() => {
     const timer = setInterval(() => setDateTime(new Date()), 1000);
@@ -29,18 +31,20 @@ const TopBar = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleLogoutShortcut = (event) => {
+      if (event.ctrlKey && event.key === 'l') {
+        logout();
+      }
+    };
+    window.addEventListener('keydown', handleLogoutShortcut);
+    return () => {
+      window.removeEventListener('keydown', handleLogoutShortcut);
+    };
+  }, [logout]);
+
   const refreshPage = () => {
     window.location.reload();
-  };
-
-  const handleLogoutShortcut = () => {
-    const event = new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      ctrlKey: true,
-      key: 'l',
-    });
-    window.dispatchEvent(event);
   };
 
   const toggleDropdown = () => {
@@ -85,7 +89,7 @@ const TopBar = () => {
             </div>
             <button className="dropdown-button" onClick={openSettings}>Settings</button>
             <button className="dropdown-button">Option 3</button>
-            <button className="logout-button" onClick={handleLogoutShortcut}>
+            <button className="logout-button" onClick={logout}>
               <ExitToAppIcon /> Logout
             </button>
           </div>

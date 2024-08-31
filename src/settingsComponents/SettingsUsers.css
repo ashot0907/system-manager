@@ -1,0 +1,25 @@
+.settings-users {
+    padding: 20px;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .verify-password,
+  .change-password {
+    margin-top: 20px;
+  }
+  
+  
+ 
+  
+  
+  .error {
+    color: #ff5f56;
+    margin-top: 10px;
+  }
+  
+  .success {
+    color: #27c93f;
+    margin-top: 10px;
+  }
+  

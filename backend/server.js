@@ -1,8 +1,11 @@
 const express = require('express');
+const path = require('path');
 const si = require('systeminformation');
+require('dotenv').config();
 const cors = require('cors');
 const { exec } = require('child_process');
 const os = require('os');
+const fs = require('fs');
 const systeminformation = require('systeminformation');
 
 const app = express();
@@ -194,22 +197,32 @@ app.post('/api/execute', (req, res) => {
     });
 });
 
+const SECRET_KEY = process.env.SECRET_KEY || 'Web';
+
+
 // Detect OS and handle authentication differently
 app.post('/api/authenticate', (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
-    }
-
-    if (username === 'Web' && password === 'Web33') {
-        res.json({ success: true });
+    const { password } = req.body;
+    
+    if (password === process.env.ADMIN_PASSWORD) {
+      const token = jwt.sign({ authenticated: true }, SECRET_KEY, { expiresIn: '1h' });
+      res.status(200).json({ success: true, token });
     } else {
-        res.status(401).json({ error: 'Authentication failed' });
+      res.status(401).json({ success: false, message: 'Authentication failed' });
     }
-});
+  });
 
-
+  app.post('/api/verify-token', (req, res) => {
+    const { token } = req.body;
+  
+    try {
+      jwt.verify(token, SECRET_KEY);
+      res.status(200).json({ success: true });
+    } catch (err) {
+      res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    }
+  });
+  
 
 
 app.get('/api/used-ports', (req, res) => {
@@ -281,6 +294,39 @@ app.post('/api/stop-process', (req, res) => {
         res.json({ success: true, message: `Process with PID ${pid} stopped successfully` });
     });
 });
+
+const envPath = path.join(__dirname, '.env');
+
+// Get current password (for demonstration purposes)
+app.get('/api/password', (req, res) => {
+  res.json({ password: process.env.ADMIN_PASSWORD });
+});
+
+// Verify password
+app.post('/api/verify-password', (req, res) => {
+  const { password } = req.body;
+  if (password === process.env.ADMIN_PASSWORD) {
+    res.status(200).json({ success: true });
+  } else {
+    res.status(401).json({ success: false, message: 'Incorrect password' });
+  }
+});
+
+// Update password (Note: Updating .env programmatically is not typical and should be done cautiously)
+app.post('/api/update-password', (req, res) => {
+  const { newPassword } = req.body;
+  
+  const envData = fs.readFileSync(envPath, 'utf8');
+  const updatedEnvData = envData.replace(/ADMIN_PASSWORD=.*/, `ADMIN_PASSWORD=${newPassword}`);
+  
+  fs.writeFileSync(envPath, updatedEnvData, 'utf8');
+  
+  // Reload the environment variables
+  require('dotenv').config();
+  
+  res.status(200).json({ success: true, message: 'Password updated successfully' });
+});
+
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

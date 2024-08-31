@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import TaskManager from './TaskManager';
 import FileSystem from './FileSystem';
@@ -12,7 +12,7 @@ import terminalImg from './assets/terminal.png';
 import monitorResourcesImg from './assets/servermanagement.png';
 import serverManagementImg from './assets/monitorresorses.png';
 import InfoIcon from './assets/infoIcon.png';
-import DropboxImg from './assets/Dropbox.png'; // Import Dropbox image
+import DropboxImg from './assets/Dropbox.png';
 import TopBar from './TopBar';
 import './App.css';
 import Dropbox from './Dropbox';
@@ -32,26 +32,23 @@ const theme = createTheme({
 });
 
 const AppContent = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [terminals, setTerminals] = useState([]);
   const [nextTerminalId, setNextTerminalId] = useState(1);
   const [systemInfo, setSystemInfo] = useState({ isOpen: false, isFullscreen: false, isMinimized: false });
-  const [isDropboxVisible, setDropboxVisible] = useState(false); // State to control Dropbox visibility
+  const [isDropboxVisible, setDropboxVisible] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.ctrlKey && event.key === 'l') {
-        logout();
-        navigate('/');
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [logout, navigate]);
+    if (!isAuthenticated && location.pathname !== '/login') {
+      navigate('/login');
+    }
+  }, [isAuthenticated, location, navigate]);
+
+  if (!isAuthenticated && location.pathname !== '/login') {
+    return <Navigate to="/login" />;
+  }
 
   const addTerminal = () => {
     setTerminals((prevTerminals) => [
@@ -125,18 +122,19 @@ const AppContent = () => {
 
   return (
     <div id="main">
-      {isAuthenticated && <TopBar />} {/* Add TopBar here */}
+      {isAuthenticated && location.pathname !== '/login' && <TopBar />} {/* Only render TopBar if authenticated */}
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/file-system" element={<ProtectedRoute component={FileSystem} />} />
-        <Route path="/task-manager" element={<ProtectedRoute component={TaskManager} />} />
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/file-system" element={<ProtectedRoute element={<FileSystem />} />} />
+        <Route path="/task-manager" element={<ProtectedRoute element={<TaskManager />} />} />
       </Routes>
-      {isAuthenticated && (
+      {isAuthenticated && location.pathname !== '/login' && (
         <>
           <Navbar
             onTerminalClick={addTerminal}
             onSystemInfoClick={openSystemInfo}
-            onDropboxClick={toggleDropboxVisibility} // Add the Dropbox toggle function to Navbar
+            onDropboxClick={toggleDropboxVisibility}
             minimizedTerminals={minimizedTerminals}
             restoreTerminal={restoreTerminal}
           />
