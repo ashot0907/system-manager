@@ -1,34 +1,68 @@
-// Settings.js
-import React from 'react';
+import React, { useState } from 'react';
+import Draggable from 'react-draggable';
 import './Settings.css';
+import SettingsHome from './settingsComponents/SettingsHome';
+import SettingsUsers from './settingsComponents/SettingsUsers';
+import SettingsAbout from './settingsComponents/SettingsAbout';
 
-const Settings = ({ onClose }) => {
-  const themeImages = [
-    { name: 'blueTheme', src: require('./assets/themes/blueTheme.jpg') },
-    { name: 'darkTheme1', src: require('./assets/themes/darkTheme1.jpg') },
-    { name: 'darkTheme2', src: require('./assets/themes/darkTheme2.jpg') },
-    { name: 'redTheme', src: require('./assets/themes/redTheme.jpg') },
-    { name: 'whiteTheme', src: require('./assets/themes/whiteTheme.jpg') },
-    { name: 'GreenTheme', src: require('./assets/themes/GreenTheme.jpg') },
-  ];
+const SettingsComponent = ({ onClose }) => {
+  const [activeTab, setActiveTab] = useState('home');
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleImageClick = (image) => {
-    document.body.style.backgroundImage = `url(${image.src})`;
+  const handleFullScreen = () => {
+    setIsFullScreen(!isFullScreen);
+    // Reset position when entering/exiting fullscreen
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const onDrag = (e, data) => {
+    setPosition({ x: data.x, y: data.y });
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return <SettingsHome />;
+      case 'users':
+        return <SettingsUsers />;
+      case 'about':
+        return <SettingsAbout />;
+      default:
+        return null;
+    }
   };
 
   return (
-    <div className="settings-popup">
-      <button className="close-button" onClick={onClose}>Close</button>
-      <h2>Choose Background</h2>
-      <div className="theme-previews">
-        {themeImages.map((image) => (
-          <div key={image.name} className="theme-preview" onClick={() => handleImageClick(image)}>
-            <img src={image.src} alt={image.name} />
+    <Draggable
+      handle=".settings-header"
+      position={isFullScreen ? { x: 0, y: 0 } : position}
+      onDrag={onDrag}
+      disabled={isFullScreen} // Disable dragging in fullscreen mode
+    >
+      <div className={`settings-window ${isFullScreen ? 'fullscreen' : ''}`}>
+        <div className="settings-header">
+          <div className="mac-buttons">
+            <button className="mac-btn red" onClick={onClose}></button>
+            <button className="mac-btn yellow" onClick={handleFullScreen}></button>
+            <button className="mac-btn green" onClick={handleFullScreen}></button>
           </div>
-        ))}
+        </div>
+        <div className="settings-body">
+          <nav className="settings-sidebar">
+            <ul>
+              <li className={activeTab === 'home' ? 'active' : ''} onClick={() => setActiveTab('home')}>Home</li>
+              <li className={activeTab === 'users' ? 'active' : ''} onClick={() => setActiveTab('users')}>Users</li>
+              <li className={activeTab === 'about' ? 'active' : ''} onClick={() => setActiveTab('about')}>About</li>
+            </ul>
+          </nav>
+          <div className="settings-content">
+            {renderContent()}
+          </div>
+        </div>
       </div>
-    </div>
+    </Draggable>
   );
 };
 
-export default Settings;
+export default SettingsComponent;

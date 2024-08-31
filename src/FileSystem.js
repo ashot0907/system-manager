@@ -13,25 +13,9 @@ function FileSystem() {
 
     useEffect(() => {
         if (!selectedFile) {
-            fetch(`http://0.0.0.0:5005/files?path=${encodeURIComponent(currentPath)}`)
+            fetch(`http://localhost:5005/files?path=${encodeURIComponent(currentPath)}`)
                 .then(response => response.json())
-                .then(data => {
-                    // Add Go Back button as the first item
-                    const goBackFolder = currentPath !== '/' ? {
-                        name: '..',
-                        isDirectory: true,
-                        path: currentPath.split('/').slice(0, -1).join('/') || '/'
-                    } : null;
-
-                    const initialFiles = (goBackFolder ? [goBackFolder, ...data] : data).map((file, index) => ({
-                        ...file,
-                        position: {
-                            x: (index % 5) * 120 + 20, // 120px horizontal gap
-                            y: Math.floor(index / 5) * 120 + 20, // 120px vertical gap
-                        }
-                    }));
-                    setFiles(initialFiles);
-                })
+                .then(data => setFiles(data))
                 .catch(error => console.error('Error fetching files:', error));
         }
     }, [currentPath, selectedFile]);
@@ -50,7 +34,7 @@ function FileSystem() {
     };
 
     const handleFileClick = (file) => {
-        fetch(`http://0.0.0.0:5005/files/content?path=${encodeURIComponent(file.path)}`)
+        fetch(`http://localhost:5005/files/content?path=${encodeURIComponent(file.path)}`)
             .then(response => response.text())
             .then(data => {
                 setSelectedFile(file);
@@ -62,7 +46,7 @@ function FileSystem() {
     };
 
     const handleSave = () => {
-        fetch(`http://0.0.0.0:5005/files/save`, {
+        fetch(`http://localhost:5005/files/save`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -111,7 +95,7 @@ function FileSystem() {
 
     const handleDelete = () => {
         if (contextMenu && contextMenu.file) {
-            fetch(`http://0.0.0.0:5005/files/delete`, {
+            fetch(`http://localhost:5005/files/delete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -129,7 +113,7 @@ function FileSystem() {
     const handleRename = () => {
         const newName = prompt('Enter the new name:', contextMenu.file.name);
         if (newName) {
-            fetch(`http://0.0.0.0:5005/files/rename`, {
+            fetch(`http://localhost:5005/files/rename`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -147,7 +131,7 @@ function FileSystem() {
     const handleCreateFolder = () => {
         const folderName = prompt('Enter the folder name:');
         if (folderName) {
-            fetch(`http://0.0.0.0:5005/files/create-folder`, {
+            fetch(`http://localhost:5005/files/create-folder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -165,7 +149,7 @@ function FileSystem() {
     const handleCreateTextFile = () => {
         const fileName = prompt('Enter the file name (with .txt extension):');
         if (fileName) {
-            fetch(`http://0.0.0.0:5005/files/create-text-file`, {
+            fetch(`http://localhost:5005/files/create-text-file`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -182,7 +166,7 @@ function FileSystem() {
 
     const handleUnzip = () => {
         if (contextMenu && contextMenu.file) {
-            fetch(`http://0.0.0.0:5005/files/unzip`, {
+            fetch(`http://localhost:5005/files/unzip`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -200,7 +184,7 @@ function FileSystem() {
     const handleDownload = () => {
         if (contextMenu && contextMenu.file) {
             const downloadLink = document.createElement('a');
-            downloadLink.href = `http://0.0.0.0:5005/files/download?path=${encodeURIComponent(contextMenu.file.path)}`;
+            downloadLink.href = `http://localhost:5005/files/download?path=${encodeURIComponent(contextMenu.file.path)}`;
             downloadLink.download = contextMenu.file.name;
             document.body.appendChild(downloadLink);
             downloadLink.click();
@@ -209,26 +193,8 @@ function FileSystem() {
         }
     };
 
-    const handleDragStart = (event, index) => {
-        event.dataTransfer.setData('index', index);
-    };
-
-    const handleDrop = (event) => {
-        const index = event.dataTransfer.getData('index');
-        const newFiles = [...files];
-        newFiles[index].position = {
-            x: event.clientX - 30, // Center the icon at the mouse position
-            y: event.clientY - 30,
-        };
-        setFiles(newFiles);
-    };
-
-    const handleDragOver = (event) => {
-        event.preventDefault(); // Necessary to allow a drop
-    };
-
     return (
-        <div className="desktop" onContextMenu={handleContextMenu} onDrop={handleDrop} onDragOver={handleDragOver}>
+        <div className="desktop" onContextMenu={handleContextMenu}>
             <div className="pwd-display" style={{ position: 'absolute', top: '10px', left: '20px' }}>{currentPath}</div>
 
             {selectedFile ? (
@@ -257,18 +223,17 @@ function FileSystem() {
                 </div>
             ) : (
                 <>
+                    {currentPath !== '/' && (
+                        <div className="file-icon" onClick={handleGoBack} onMouseEnter={() => handleMouseEnter(null)} onMouseLeave={handleMouseLeave}>
+                            <img src="/imgs/gobackdir.png" alt="folder icon" />
+                            <p>..</p>
+                        </div>
+                    )}
                     {files.map((file, index) => (
                         <div
                             key={index}
                             className="file-icon"
-                            style={{
-                                position: 'absolute',
-                                left: `${file.position.x}px`,
-                                top: `${file.position.y}px`,
-                            }}
                             onClick={() => file.isDirectory ? handleDirectoryClick(file.path) : handleFileClick(file)}
-                            draggable
-                            onDragStart={(event) => handleDragStart(event, index)}
                             onMouseEnter={() => handleMouseEnter(file)}
                             onMouseLeave={handleMouseLeave}
                         >

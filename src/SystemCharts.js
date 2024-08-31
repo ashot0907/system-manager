@@ -23,7 +23,7 @@ const SystemCharts = () => {
   const chartRefs = useRef([]);
 
   useEffect(() => {
-    axios.get('http://0.0.0.0:5000/api/system')
+    axios.get('http://localhost:5000/api/system')
       .then(response => {
         setData(response.data);
       })

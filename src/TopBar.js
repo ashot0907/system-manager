@@ -1,13 +1,15 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import MenuIcon from '@mui/icons-material/Menu';
 import './TopBar.css';
+import SettingsComponent from './Settings'; // Import the SettingsComponent
 
 const TopBar = () => {
   const [dateTime, setDateTime] = useState(new Date());
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [brightness, setBrightness] = useState(1); // Default brightness
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [brightness, setBrightness] = useState(1);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -51,6 +53,14 @@ const TopBar = () => {
     document.body.style.filter = `brightness(${newBrightness})`;
   };
 
+  const openSettings = () => {
+    setIsSettingsOpen(true);
+  };
+
+  const closeSettings = () => {
+    setIsSettingsOpen(false);
+  };
+
   return (
     <div className="top-bar">
       <span className="date-time">
@@ -73,7 +83,7 @@ const TopBar = () => {
                 onChange={handleBrightnessChange}
               />
             </div>
-            <button className="dropdown-button">Option 2</button>
+            <button className="dropdown-button" onClick={openSettings}>Settings</button>
             <button className="dropdown-button">Option 3</button>
             <button className="logout-button" onClick={handleLogoutShortcut}>
               <ExitToAppIcon /> Logout
@@ -81,6 +91,9 @@ const TopBar = () => {
           </div>
         </div>
       </div>
+      {isSettingsOpen && (
+        <SettingsComponent onClose={closeSettings} />
+      )}
     </div>
   );
 };

@@ -2,31 +2,45 @@ import React, { useState, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 } from '@mui/material';
-import Draggable from 'react-draggable'; // Import Draggable
+import Draggable from 'react-draggable';
 import './SystemInfo.css';
 
 const SystemInfo = ({ onClose, onCollapse, onExpand, isFullscreen }) => {
   const [systemInfo, setSystemInfo] = useState({});
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     // Fetch system information
-    fetch('http://0.0.0.0:5000/api/system-info')
+    fetch('http://localhost:5000/api/system-info')
       .then(response => response.json())
       .then(data => {
-        // Set the data directly without any conversion
         setSystemInfo(data);
       })
       .catch(error => console.error('Error fetching system info:', error));
   }, []);
 
+  const handleExpand = () => {
+    onExpand();
+    setPosition({ x: 0, y: 0 }); // Reset position when going fullscreen
+  };
+
+  const onDrag = (e, data) => {
+    setPosition({ x: data.x, y: data.y });
+  };
+
   return (
-    <Draggable handle=".window-header">
+    <Draggable
+      handle=".window-header"
+      position={isFullscreen ? { x: 0, y: 0 } : position}
+      onDrag={onDrag}
+      disabled={isFullscreen} // Disable dragging in fullscreen mode
+    >
       <div className={`system-info-window ${isFullscreen ? 'fullscreen' : ''}`}>
         <div className="window-header">
           <div className="window-buttons">
             <span className="window-button close" onClick={onClose}></span>
-            <span className="window-button minimize" onClick={onClose}></span> {/* Yellow button acts like close */}
-            <span className="window-button maximize" onClick={onExpand}></span>
+            <span className="window-button minimize" onClick={onClose}></span> {/* Yellow button now closes the window */}
+            <span className="window-button maximize" onClick={handleExpand}></span>
           </div>
           <span className="window-title">System Info</span>
         </div>

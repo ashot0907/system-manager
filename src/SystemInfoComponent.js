@@ -19,7 +19,7 @@
 //     useEffect(() => {
 //         const fetchData = async () => {
 //             try {
-//                 const response = await axios.get('http://0.0.0.0:5000/api/system-stats');
+//                 const response = await axios.get('http://localhost:5000/api/system-stats');
 //                 setStats(response.data);
 //             } catch (error) {
 //                 console.error('Error fetching system stats:', error);

@@ -3,11 +3,12 @@ import axios from 'axios';
 import Draggable from 'react-draggable';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
-import './Terminal.css'; // Import the CSS file for styling
+import './Terminal.css';
 
 const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initialCommand, output: initialOutput, updateState }) => {
   const [command, setCommand] = useState(initialCommand);
   const [output, setOutput] = useState(initialOutput);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const handleCommandSubmit = async () => {
     if (command.trim() === 'clear') {
@@ -18,7 +19,7 @@ const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initia
     }
 
     try {
-      const response = await axios.post('http://0.0.0.0:5000/api/execute', { command });
+      const response = await axios.post('http://localhost:5000/api/execute', { command });
       const newOutput = `${output}\n${command}\n${response.data.output}`;
       setOutput(newOutput);
       updateState('', newOutput);
@@ -36,12 +37,22 @@ const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initia
     }
   };
 
-  useEffect(() => {
-    updateState(command, output);
-  }, [command, output, updateState]);
+  const handleExpand = () => {
+    onExpand();
+    setPosition({ x: 0, y: 0 }); // Reset position when going fullscreen
+  };
+
+  const onDrag = (e, data) => {
+    setPosition({ x: data.x, y: data.y });
+  };
 
   return (
-    <Draggable handle=".terminal-header">
+    <Draggable
+      handle=".terminal-header"
+      position={isFullscreen ? { x: 0, y: 0 } : position}
+      onDrag={onDrag}
+      disabled={isFullscreen} // Disable dragging in fullscreen mode
+    >
       <div className={isFullscreen ? 'fullscreen' : ''}>
         <ResizableBox
           width={isFullscreen ? window.innerWidth : 600}
@@ -54,7 +65,7 @@ const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initia
             <div className="terminal-header">
               <button className="btn red" onClick={onClose}></button>
               <button className="btn yellow" onClick={onCollapse}></button>
-              <button className="btn green" onClick={onExpand}></button>
+              <button className="btn green" onClick={handleExpand}></button>
             </div>
             <pre className="terminal-output">{output}</pre>
             <div className="terminal-input">
