@@ -1,14 +1,14 @@
 .settings-window {
-  width: 600px;
-  height: 400px;
+  width: 800px;
+  height: 500px;
   background-color: #333;
   color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-  position: fixed; /* Change to fixed for proper centering */
+  position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Center horizontally and vertically */
+  transform: translate(-50%, -50%);
   overflow: hidden;
   z-index: 1000;
 }
@@ -65,6 +65,8 @@
   background-color: #222;
   padding: 10px;
   border-right: 1px solid #555;
+  overflow-y: auto;
+  height: 100%; /* Full height sidebar */
 }
 
 .settings-sidebar ul {
@@ -88,6 +90,19 @@
   flex-grow: 1;
   padding: 20px;
   overflow-y: auto;
+}
+
+.settings-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 4px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .settings-content h2 {

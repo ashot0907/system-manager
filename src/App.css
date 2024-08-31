@@ -1,5 +1,5 @@
 #main {
-  background-color: #1e1e1e;
+  /* background-color: #1e1e1e; */
   height: calc(100vh - 100px); /* Adjust height to account for the dock */
   display: flex;
   flex-direction: column;
@@ -13,9 +13,12 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  background-image: url(./assets/bgs/bg3.jpg);
+  background-repeat: repeat-y;
+  background-size: 100%;
 }
 
-.dock {
+.dock { 
   display: flex;
   justify-content: center;
   align-items: center;
