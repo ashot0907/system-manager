@@ -58,11 +58,16 @@ const TopBar = () => {
   };
 
   const openSettings = () => {
+    setIsDropdownOpen(false);
     setIsSettingsOpen(true);
   };
 
   const closeSettings = () => {
     setIsSettingsOpen(false);
+  };
+
+  const handleOptionClick = () => {
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -88,8 +93,8 @@ const TopBar = () => {
               />
             </div>
             <button className="dropdown-button" onClick={openSettings}>Settings</button>
-            <button className="dropdown-button">Option 3</button>
-            <button className="logout-button" onClick={logout}>
+            <button className="dropdown-button" onClick={handleOptionClick}>Option 3</button>
+            <button className="logout-button" onClick={() => { logout(); handleOptionClick(); }}>
               <ExitToAppIcon /> Logout
             </button>
           </div>

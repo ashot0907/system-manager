@@ -72,7 +72,7 @@ const CpuCoresStream = () => {
   }
 
   return (
-    <div className="chart-container">
+    <div className="chart-container" id='bgP'>
       <h3>CPU Cores Usage</h3>
       <Line data={chartData} />
       <h3></h3>

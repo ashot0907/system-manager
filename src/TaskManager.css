@@ -9,5 +9,7 @@
     border: 1px solid rgba(172, 255, 47, 0.21);
     padding: 10px;
     border-radius: 10px;
+    backdrop-filter: blur(190px);
+
   }
   

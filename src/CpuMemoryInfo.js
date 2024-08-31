@@ -26,7 +26,7 @@ const CpuMemoryInfo = () => {
   }, []);
 
   return (
-    <Card elevation={3} style={{ marginTop: '20px' }}>
+    <Card elevation={3} style={{ marginTop: '20px' }} id='bgP'>
       <CardContent>
         <Typography variant="h4" component="h1" gutterBottom>
           CPU and Memory Info

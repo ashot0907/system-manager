@@ -11,6 +11,8 @@
   top: 0;
   right: 0px;
   z-index: 1000;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.993) 1%, transparent 22%);
+  /* backdrop-filter: blur(8px); */
 }
 
 .date-time {

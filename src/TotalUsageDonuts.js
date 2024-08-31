@@ -56,7 +56,7 @@ const TotalUsageDonuts = () => {
   };
 
   return (
-    <div id="donuts">
+    <div id="donuts" className='bgP'>
       <div className="doughnut-chart">
         <h3>CPU Usage</h3>
         <Doughnut data={cpuData} width={250} height={250}/>

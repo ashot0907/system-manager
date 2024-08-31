@@ -73,7 +73,7 @@ const SystemCharts = () => {
   };
 
   return (
-    <div className="chart-container">
+    <div className="chart-container" id='bgP'>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div>
           <h3>CPU Usage</h3>

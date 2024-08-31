@@ -1,5 +1,5 @@
 .settings-window {
-  width: 800px;
+  width: 900px;
   height: 500px;
   background-color: #333;
   color: #fff;
@@ -61,7 +61,7 @@
 }
 
 .settings-sidebar {
-  width: 150px;
+  width: 290px;
   background-color: #222;
   padding: 10px;
   border-right: 1px solid #555;
