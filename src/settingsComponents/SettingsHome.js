@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SettingsHome.css'; // Import the CSS file for styling
 
 import bg1 from '../assets/bgs/bg1.jpg';
@@ -8,15 +8,24 @@ import bg3 from '../assets/bgs/bg3.jpg';
 const backgrounds = [
   { id: 1, name: 'Blue Theme', src: bg1 },
   { id: 2, name: 'Dark Theme', src: bg2 },
-  { id: 3, name: 'Dark Theme', src: bg3 },
-
+  { id: 3, name: 'Another Dark Theme', src: bg3 },
 ];
 
 const SettingsHome = () => {
   const [buttonText, setButtonText] = useState('Check for Updates');
 
+  useEffect(() => {
+    // Reapply the background in case it was overridden
+    const savedBackground = localStorage.getItem('selectedBackground');
+    if (savedBackground) {
+      document.body.style.backgroundImage = `url(${savedBackground})`;
+    }
+  }, []);
+
   const handleBackgroundChange = (src) => {
     document.body.style.backgroundImage = `url(${src})`;
+    // Save the selected background to localStorage
+    localStorage.setItem('selectedBackground', src);
   };
 
   const handleCheckForUpdates = () => {
