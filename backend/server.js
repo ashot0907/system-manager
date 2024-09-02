@@ -199,6 +199,8 @@ app.post('/api/execute', (req, res) => {
 
 const SECRET_KEY = process.env.SECRET_KEY || 'Web';
 
+const jwt = require('jsonwebtoken');
+
 
 // Detect OS and handle authentication differently
 app.post('/api/authenticate', (req, res) => {
