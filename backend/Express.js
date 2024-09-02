@@ -174,7 +174,61 @@ app.get('/files/download', (req, res) => {
     }
 });
 
-
+const updateVersion = () => {
+    const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+    let versionParts = packageJson.version.split('.');
+    versionParts[2] = (parseInt(versionParts[2]) + 1).toString(); // Increment the patch version (third number)
+    packageJson.version = versionParts.join('.');
+    fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 2)); // Save updated version
+    return packageJson.version; // Return the updated version
+  };
+  
+  // Function to get the current version
+  const getCurrentVersion = () => {
+    const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+    return packageJson.version;
+  };
+  
+  app.post('/check-for-updates', (req, res) => {
+    exec('git fetch', (error, stdout, stderr) => {
+      if (error) {
+        return res.status(500).json({ message: 'Error occurred during fetch.', error: stderr });
+      }
+  
+      exec('git status -uno', (statusError, statusStdout, statusStderr) => {
+        if (statusError) {
+          return res.status(500).json({ message: 'Error occurred during status check.', error: statusStderr });
+        }
+  
+        if (statusStdout.includes('Your branch is up to date')) {
+          return res.status(200).json({ message: 'No updates available.', version: getCurrentVersion() });
+        } else {
+          exec('git pull', (pullError, pullStdout, pullStderr) => {
+            if (pullError) {
+              return res.status(500).json({ message: 'Error occurred during pull.', error: pullStderr });
+            }
+  
+            const updatedVersion = updateVersion();
+            res.status(200).json({ message: 'Updates pulled and applied!', version: updatedVersion });
+          });
+        }
+      });
+    });
+  });
+  
+  app.post('/hard-reset', (req, res) => {
+    exec('git reset --hard', (error, stdout, stderr) => {
+      if (error) {
+        return res.status(500).json({ message: 'Error occurred during hard reset.', error: stderr });
+      }
+      res.status(200).json({ message: 'Hard reset completed.' });
+    });
+  });
+  
+  app.get('/version', (req, res) => {
+    res.status(200).json({ version: getCurrentVersion() });
+  });
+    
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
