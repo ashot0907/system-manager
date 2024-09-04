@@ -7,6 +7,8 @@ const { exec } = require('child_process');
 const os = require('os');
 const fs = require('fs');
 const systeminformation = require('systeminformation');
+const multer = require('multer');
+
 
 const app = express();
 const port = 5000;
@@ -328,6 +330,57 @@ app.post('/api/update-password', (req, res) => {
   
   res.status(200).json({ success: true, message: 'Password updated successfully' });
 });
+
+const upload = multer({ dest: 'uploads/' });
+
+let servers = [];
+
+function checkIfRunning(port, callback) {
+  exec(`lsof -i:${port}`, (error, stdout) => {
+    if (error) {
+      callback(false);
+    } else {
+      callback(true);
+    }
+  });
+}
+
+app.post('/start-server', upload.array('files'), (req, res) => {
+  const port = req.body.port;
+  const folderPath = path.join(__dirname, 'uploads', Date.now().toString());
+
+  fs.mkdirSync(folderPath);
+
+  req.files.forEach(file => {
+    const targetPath = path.join(folderPath, file.originalname);
+    fs.renameSync(file.path, targetPath);
+  });
+
+  const staticServerCommand = `npx http-server ${folderPath} -p ${port}`;
+  
+  exec(staticServerCommand, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error starting server: ${error.message}`);
+      return res.status(500).send('Failed to start server');
+    }
+    
+    servers.push({ folderPath, port, name: req.files[0].originalname, status: 'Running' });
+    console.log(`Server started on port ${port}`);
+    res.send(`Server started on port ${port}`);
+  });
+});
+
+app.get('/servers', (req, res) => {
+  servers.forEach((server, index) => {
+    checkIfRunning(server.port, (isRunning) => {
+      servers[index].status = isRunning ? 'Running' : 'Not Running';
+    });
+  });
+
+  res.json(servers);
+});
+
+
 
 
 app.listen(port, () => {

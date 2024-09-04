@@ -4,12 +4,15 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import MenuIcon from '@mui/icons-material/Menu';
 import './TopBar.css';
 import SettingsComponent from './Settings'; 
+import Deploy from './Deploy'; // Import the Deploy component
 import { useAuth } from './AuthContext';
+import Draggable from 'react-draggable';
 
 const TopBar = () => {
   const [dateTime, setDateTime] = useState(new Date());
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDeployOpen, setIsDeployOpen] = useState(false); // State for Deploy visibility
   const [brightness, setBrightness] = useState(1);
   const dropdownRef = useRef(null);
   const { logout } = useAuth();
@@ -66,6 +69,15 @@ const TopBar = () => {
     setIsSettingsOpen(false);
   };
 
+  const openDeploy = () => {
+    setIsDropdownOpen(false);
+    setIsDeployOpen(true); // Open Deploy component
+  };
+
+  const closeDeploy = () => {
+    setIsDeployOpen(false); // Close Deploy component
+  };
+
   const handleOptionClick = () => {
     setIsDropdownOpen(false);
   };
@@ -93,7 +105,7 @@ const TopBar = () => {
               />
             </div>
             <button className="dropdown-button" onClick={openSettings}>Settings</button>
-            <button className="dropdown-button" onClick={handleOptionClick}>Option 3</button>
+            <button className="dropdown-button" onClick={openDeploy}>Deployment</button> {/* Opens Deploy */}
             <button className="logout-button" onClick={() => { logout(); handleOptionClick(); }}>
               <ExitToAppIcon /> Logout
             </button>
@@ -102,6 +114,13 @@ const TopBar = () => {
       </div>
       {isSettingsOpen && (
         <SettingsComponent onClose={closeSettings} />
+      )}
+      {isDeployOpen && ( // Render Deploy component when state is true
+        <Draggable handle=".drag-handleD" defaultPosition={{ x: -1000, y: window.innerHeight / 2 - 200 }}>
+          <div>
+            <Deploy onClose={closeDeploy} />
+          </div>
+        </Draggable>
       )}
     </div>
   );

@@ -1,0 +1,91 @@
+.dark-themeD {
+  background-color: #2c2f33;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.draggable-containerD {
+  position: absolute;
+  z-index: 1000;
+  border: 1px solid #555;
+}
+
+.mac-buttonsD {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.mac-buttonD {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: none;
+}
+
+.mac-buttonD.redD {
+  background-color: #ff5f57;
+}
+
+.mac-buttonD.greyD {
+  background-color: #c1c1c1;
+}
+
+.title-barD {
+  cursor: move;
+  background-color: #23272a;
+  padding: 10px;
+  border-radius: 10px 10px 0 0;
+  text-align: center;
+}
+
+.upload-sectionD {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.port-inputD {
+  padding: 8px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background-color: #23272a;
+  color: #ffffff;
+}
+
+.start-buttonD {
+  padding: 10px;
+  background-color: #7289da;
+  border: none;
+  border-radius: 5px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.start-buttonD:hover {
+  background-color: #5a73b9;
+}
+
+.logs-sectionD {
+  background-color: #23272a;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.logs-sectionD ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.logs-sectionD li {
+  padding: 5px 0;
+  border-bottom: 1px solid #555;
+}
+
+.logs-sectionD h3 {
+  margin-top: 0;
+}
