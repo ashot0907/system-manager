@@ -7,6 +7,9 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { Border } from 'victory';
+import { color } from 'chart.js/helpers';
+import { BorderColor } from '@mui/icons-material';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -35,7 +38,8 @@ const TotalUsageDonuts = () => {
     labels: ['Used CPU %', 'Free CPU %'],
     datasets: [{
       data: [totalCpuUsage, 100 - totalCpuUsage],
-      backgroundColor: ['rgba(172, 255, 47, 0.21)', 'rgba(75,192,192,0.7'],
+       backgroundColor: ['rgb(205, 205, 205)', 'rgb(102, 107, 112)'],
+       borderColor: "rgba(249, 105, 14)"
     }],
   };
 
@@ -43,7 +47,8 @@ const TotalUsageDonuts = () => {
     labels: ['Used GPU %', 'Free GPU %'],
     datasets: [{
       data: totalGpuUsage !== 'N/A' ? [totalGpuUsage, 100 - totalGpuUsage] : [0, 100],
-      backgroundColor: ['rgba(172, 255, 47, 0.21)', 'rgba(75,192,192,0.7'],
+      backgroundColor: ['rgb(205, 205, 205)', 'rgb(102, 107, 112)'],
+      borderColor: "rgba(249, 105, 14)"
     }],
   };
 
@@ -51,7 +56,8 @@ const TotalUsageDonuts = () => {
     labels: ['Used Memory MB', 'Free Memory MB'],
     datasets: [{
       data: [memory.used / 1024 / 1024, memory.free / 1024 / 1024],
-      backgroundColor: ['rgba(172, 255, 47, 0.21)', 'rgba(75,192,192,0.7'],
+      backgroundColor: ['rgb(205, 205, 205)', 'rgb(102, 107, 112)'],
+      borderColor: "rgba(249, 105, 14)"
     }],
   };
 

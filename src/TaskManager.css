@@ -6,10 +6,22 @@
   }
   
   .card {
-    border: 1px solid rgba(172, 255, 47, 0.21);
+    border: 1px solid rgba(0, 0, 0, 0.21);
     padding: 10px;
     border-radius: 10px;
     backdrop-filter: blur(190px);
 
   }
+
+  .idjeidj{
+    color: rgb(205, 205, 205);
+  }
   
+.chart-container h3{
+  color: white !important;
+}
+
+.doughnut-chart h3{
+  color: white !important;
+
+}

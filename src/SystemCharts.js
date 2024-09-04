@@ -46,8 +46,8 @@ const SystemCharts = () => {
       datasets: [{
         label: `${type.toUpperCase()} Usage`,
         data: values,
-        backgroundColor: 'rgba(75,192,192,0.2)',
-        borderColor: 'rgba(75,192,192,1)',
+        backgroundColor: 'rgb(102, 107, 112)',
+        borderColor: 'rgba(249, 105, 14)',
         borderWidth: 1
       }],
     };

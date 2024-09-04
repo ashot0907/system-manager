@@ -58,7 +58,7 @@ const CpuCoresStream = () => {
       datasets: [{
         label: 'CPU Core Usage %',
         data: values,
-        borderColor: 'rgba(75,192,192,1)',
+        borderColor: 'rgba(249, 105, 14)',
         backgroundColor: 'rgba(75,192,192,0.2)',
         fill: false,
       }],
