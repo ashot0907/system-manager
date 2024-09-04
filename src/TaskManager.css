@@ -2,6 +2,7 @@
     display: flex;
     gap: 20px;
     justify-content: center;
+    /* align-items: left; */
     height: 100%;
   }
   
@@ -24,4 +25,9 @@
 .doughnut-chart h3{
   color: white !important;
 
+}
+
+#flw{
+  width: 1350px;
+  margin-left: -110px;
 }
