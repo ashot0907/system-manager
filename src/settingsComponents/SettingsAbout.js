@@ -6,7 +6,7 @@ const SettingsAbout = () => {
       <h2>About</h2>
       <p>WebOS System Manager</p>
       <p>All rights reserved WebOS</p>
-      <p>Version: 3.0.0</p>
+      <p>Version: Community-Testing</p>
       <p>Developed by WebOS IT Department</p>
       <p>For technical support, contact: support@webos.com</p>
       <div className="settings-option">

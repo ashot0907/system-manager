@@ -30,4 +30,37 @@
 #flw{
   width: 1350px;
   margin-left: -110px;
+} 
+
+
+
+@media (max-width: 1600px) {
+  .dashboard {
+    gap: 10px;
+  }
+
+  .card{
+    max-width: 300px !important;
+    /* background-color: red !important; */
+    height: fit-content;
+  }
+
+  #flw{
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0px;
+    margin-top: 230px;
+  } 
 }
+
+@media (max-width: 768px) {
+  .dashboard {
+    gap: 15px;
+  }
+
+  .card {
+    padding: 8px;
+  }
+
+}
+

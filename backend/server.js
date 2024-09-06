@@ -229,58 +229,6 @@ app.post('/api/authenticate', (req, res) => {
   
 
 
-app.get('/api/used-ports', (req, res) => {
-    const platform = os.platform();
-    let command;
-
-    if (platform === 'win32') {
-        command = 'netstat -ano'; 
-    } else {
-        command = 'lsof -iTCP -sTCP:LISTEN -n -P';
-    }
-
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return res.status(500).json({ error: 'Something went wrong' });
-        }
-
-        let data;
-        if (platform === 'win32') {
-            const lines = stdout.split('\n').filter(line => line.trim() !== '');
-            data = lines.slice(4).map(line => {
-                const parts = line.trim().split(/\s+/);
-                const [protocol, localAddress, , pid] = parts;
-                const [address, port] = localAddress.split(':');
-                const user = 'N/A'; 
-                return {
-                    user,
-                    port,
-                    pid,
-                    command: protocol,
-                    args: address
-                };
-            });
-        } else {
-            const lines = stdout.split('\n').filter(line => line.trim() !== '');
-            data = lines.slice(1).map(line => {
-                const parts = line.trim().split(/\s+/);
-                const [command, pid, user, , , , , , port] = parts;
-                const args = parts.slice(8).join(' ');
-                return {
-                    user,
-                    port,
-                    pid,
-                    command,
-                    args
-                };
-            });
-        }
-
-        res.json(data);
-    });
-});
-
 app.post('/api/stop-process', (req, res) => {
     const { pid } = req.body;
     if (!pid) {
@@ -380,6 +328,57 @@ app.get('/servers', (req, res) => {
   res.json(servers);
 });
 
+app.get('/api/used-ports', (req, res) => {
+    const platform = os.platform();
+    let command;
+
+    if (platform === 'win32') {
+        command = 'netstat -ano'; 
+    } else {
+        command = 'lsof -iTCP -sTCP:LISTEN -n -P';
+    }
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return res.status(500).json({ error: 'Something went wrong' });
+        }
+
+        let data;
+        if (platform === 'win32') {
+            const lines = stdout.split('\n').filter(line => line.trim() !== '');
+            data = lines.slice(4).map(line => {
+                const parts = line.trim().split(/\s+/);
+                const [protocol, localAddress, , pid] = parts;
+                const [address, port] = localAddress.split(':');
+                const user = 'N/A'; 
+                return {
+                    user,
+                    port,
+                    pid,
+                    command: protocol,
+                    args: address
+                };
+            });
+        } else {
+            const lines = stdout.split('\n').filter(line => line.trim() !== '');
+            data = lines.slice(1).map(line => {
+                const parts = line.trim().split(/\s+/);
+                const [command, pid, user, , , , , , port] = parts;
+                const args = parts.slice(8).join(' ');
+                return {
+                    user,
+                    port,
+                    pid,
+                    command,
+                    args
+                };
+            });
+        }
+
+        res.json(data);
+    });
+});
 
 
 

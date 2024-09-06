@@ -30,7 +30,7 @@ const UsedPorts = () => {
 
     return (
         <TableContainer component={Paper} style={{ backgroundColor: '#333', width:'100%'}}>
-            <Table sx={{ minWidth: 650 }} aria-label="used ports table">
+            <Table aria-label="used ports table">
                 <TableHead>
                     <TableRow>
                         <TableCell style={{ color: '#fff' }}>User</TableCell>
