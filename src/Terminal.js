@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import Draggable from 'react-draggable';
 import { ResizableBox } from 'react-resizable';
@@ -20,7 +20,7 @@ const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initia
 
     try {
       const response = await axios.post('http://localhost:5000/api/execute', { command });
-      const newOutput = `${output}\n${command}\n${response.data.output}`;
+      const newOutput = `${output}\n${command}\n${response.data}`;
       setOutput(newOutput);
       updateState('', newOutput);
       setCommand(''); // Clear the command input in the UI
@@ -69,7 +69,7 @@ const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initia
             </div>
             <pre className="terminal-output">{output}</pre>
             <div className="terminal-input">
-              <span className="prompt">admin@admin:~$ </span>
+              <span className="prompt">webos@root:~$ </span>
               <input
                 type="text"
                 value={command}

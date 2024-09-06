@@ -175,29 +175,41 @@ app.get('/api/system-stats', async (req, res) => {
     }
 });
 
-let currentDirectory = process.cwd(); 
+const { spawn } = require('child_process');
+let currentDirectory = process.cwd();
 
 app.post('/api/execute', (req, res) => {
     let { command } = req.body;
 
+    // Handle 'cd' command
     if (command.startsWith('cd ')) {
         const newDir = command.slice(3).trim();
         try {
             process.chdir(newDir); 
             currentDirectory = process.cwd();
-            return res.json({ output: `Changed directory to ${currentDirectory}` });
+            return res.json(`Changed directory to ${currentDirectory}`);
         } catch (error) {
-            return res.status(500).json({ output: `cd: ${newDir}: No such file or directory` });
+            return res.json(`cd: ${newDir}: No such file or directory`);
         }
     }
 
-    exec(command, { cwd: currentDirectory }, (error, stdout, stderr) => {
-        if (error) {
-            return res.status(500).json({ output: stderr });
-        }
-        res.json({ output: stdout });
+    // Run the command using spawn
+    const processCommand = spawn(command, { cwd: currentDirectory, shell: true });
+
+    processCommand.stdout.on('data', (data) => {
+        res.write(data.toString()); // Ensure that you're sending plain text
+    });
+
+    processCommand.stderr.on('data', (data) => {
+        res.write(data.toString()); // Send errors as plain text
+    });
+
+    processCommand.on('close', () => {
+        res.end(); // End the response when the process finishes without sending any extra messages
     });
 });
+
+
 
 const SECRET_KEY = process.env.SECRET_KEY || 'Web';
 
