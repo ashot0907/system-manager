@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import Draggable from 'react-draggable';
 import { ResizableBox } from 'react-resizable';
@@ -9,8 +9,25 @@ const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initia
   const [command, setCommand] = useState(initialCommand);
   const [output, setOutput] = useState(initialOutput);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [history, setHistory] = useState([]); // Store command history
+  const [historyIndex, setHistoryIndex] = useState(-1); // For tracking current position in the history
+  const terminalEndRef = useRef(null); // Reference to the bottom of the terminal
+
+  // Scroll to the bottom whenever output changes
+  useEffect(() => {
+    if (terminalEndRef.current) {
+      terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [output]);
 
   const handleCommandSubmit = async () => {
+    if (command.trim() === '') return;
+
+    // Store command in history
+    const newHistory = [...history, command];
+    setHistory(newHistory);
+    setHistoryIndex(-1); // Reset history index after each new command
+
     if (command.trim() === 'clear') {
       setOutput('');
       setCommand('');
@@ -34,6 +51,21 @@ const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initia
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleCommandSubmit();
+    } else if (e.key === 'ArrowUp') {
+      if (historyIndex < history.length - 1) {
+        const newIndex = historyIndex + 1;
+        setHistoryIndex(newIndex);
+        setCommand(history[history.length - 1 - newIndex]);
+      }
+    } else if (e.key === 'ArrowDown') {
+      if (historyIndex > 0) {
+        const newIndex = historyIndex - 1;
+        setHistoryIndex(newIndex);
+        setCommand(history[history.length - 1 - newIndex]);
+      } else if (historyIndex === 0) {
+        setHistoryIndex(-1);
+        setCommand(''); // Clear input when reaching the latest history
+      }
     }
   };
 
@@ -67,14 +99,17 @@ const Terminal = ({ onClose, onCollapse, onExpand, isFullscreen, command: initia
               <button className="btn yellow" onClick={onCollapse}></button>
               <button className="btn green" onClick={handleExpand}></button>
             </div>
-            <pre className="terminal-output">{output}</pre>
+            <pre className="terminal-output">
+              {output}
+              <div ref={terminalEndRef}></div> {/* Scroll target */}
+            </pre>
             <div className="terminal-input">
               <span className="prompt">webos@root:~$ </span>
               <input
                 type="text"
                 value={command}
                 onChange={(e) => setCommand(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress} // Use onKeyDown for handling arrow keys
                 className="command-input"
                 autoFocus
               />
