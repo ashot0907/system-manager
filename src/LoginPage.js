@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { Button, TextField, Typography, Container, Paper, Box } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import './LoginPage.css';
-import loginLogo from './assets/loginlogo.png';
 
 const darkTheme = createTheme({
   palette: {
@@ -15,9 +13,6 @@ const darkTheme = createTheme({
     background: {
       default: '#121212',
       paper: '#1d1d1d',
-    },
-    text: {
-      primary: '#ffffff',
     },
   },
 });
@@ -30,10 +25,9 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const success = await login(password);
     if (success) {
-      navigate('/file-system'); // Redirect after successful login
+      navigate('/file-system');
     } else {
       setError('Authentication failed');
     }
@@ -42,13 +36,9 @@ const LoginPage = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <Container maxWidth="xs">
-        <Paper elevation={6} className="login-container">
+        <Paper elevation={6}>
           <Box p={3}>
             <form onSubmit={handleSubmit}>
-              <Box display="flex" justifyContent="center" mb={0}>
-                <img src={loginLogo} alt="Login Logo" style={{ width: '300px', height: 'auto' }} />
-              </Box>
-
               <TextField
                 label="Password"
                 type="password"
@@ -57,16 +47,9 @@ const LoginPage = () => {
                 fullWidth
                 margin="normal"
               />
-
               {error && <Typography color="error" align="center">{error}</Typography>}
-
               <Box mt={2}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                >
+                <Button type="submit" variant="contained" color="primary" fullWidth>
                   Login
                 </Button>
               </Box>

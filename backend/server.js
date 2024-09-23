@@ -8,10 +8,14 @@ const os = require('os');
 const fs = require('fs');
 const systeminformation = require('systeminformation');
 const multer = require('multer');
+const bcrypt = require('bcryptjs');
 
 
 const app = express();
 const port = 5000;
+
+let hashedAdminPassword;
+
 
 app.use(cors());
 app.use(express.json());
@@ -215,22 +219,37 @@ const SECRET_KEY = process.env.SECRET_KEY || 'Web';
 
 const jwt = require('jsonwebtoken');
 
+// Hash the ADMIN_PASSWORD at server startup
+bcrypt.hash(process.env.ADMIN_PASSWORD, 10, (err, hash) => {
+    if (err) {
+      console.error('Error hashing password:', err);
+    } else {
+      hashedAdminPassword = hash;
+      console.log('Admin password hashed successfully');
+    }
+  });
 
 // Detect OS and handle authentication differently
-app.post('/api/authenticate', (req, res) => {
+app.post('/api/authenticate', async (req, res) => {
     const { password } = req.body;
-    
-    if (password === process.env.ADMIN_PASSWORD) {
-      const token = jwt.sign({ authenticated: true }, SECRET_KEY, { expiresIn: '1h' });
-      res.status(200).json({ success: true, token });
-    } else {
-      res.status(401).json({ success: false, message: 'Authentication failed' });
+  
+    try {
+      // Compare the provided password with the hashed password
+      const passwordMatch = await bcrypt.compare(password, hashedAdminPassword);
+      if (passwordMatch) {
+        // Create and send a JWT token
+        const token = jwt.sign({ authenticated: true }, SECRET_KEY, { expiresIn: '1h' });
+        res.status(200).json({ success: true, token });
+      } else {
+        res.status(401).json({ success: false, message: 'Authentication failed' });
+      }
+    } catch (err) {
+      res.status(500).json({ success: false, message: 'Server error' });
     }
   });
 
   app.post('/api/verify-token', (req, res) => {
     const { token } = req.body;
-  
     try {
       jwt.verify(token, SECRET_KEY);
       res.status(200).json({ success: true });
@@ -239,6 +258,15 @@ app.post('/api/authenticate', (req, res) => {
     }
   });
   
+  app.get('/api/protected-data', (req, res) => {
+    const token = req.headers['authorization'].split(' ')[1]; // Extract token from Authorization header
+    try {
+      jwt.verify(token, SECRET_KEY);
+      res.json({ data: 'This is protected data.' });
+    } catch (err) {
+      res.status(401).json({ message: 'Unauthorized access' });
+    }
+  });
 
 
 app.post('/api/stop-process', (req, res) => {

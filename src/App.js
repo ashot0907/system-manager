@@ -17,6 +17,7 @@ import TopBar from './TopBar';
 import './App.css';
 import Dropbox from './Dropbox';
 
+// Theme for the application
 const theme = createTheme({
   palette: {
     primary: {
@@ -31,8 +32,9 @@ const theme = createTheme({
   },
 });
 
+// Main application content with routing and protected components
 const AppContent = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth(); // Get authentication status
   const [terminals, setTerminals] = useState([]);
   const [nextTerminalId, setNextTerminalId] = useState(1);
   const [systemInfo, setSystemInfo] = useState({ isOpen: false, isFullscreen: false, isMinimized: false });
@@ -40,16 +42,19 @@ const AppContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Redirect to login if not authenticated and trying to access any other route
   useEffect(() => {
     if (!isAuthenticated && location.pathname !== '/login') {
       navigate('/login');
     }
   }, [isAuthenticated, location, navigate]);
 
+  // Ensure that only the login page is visible to unauthorized users
   if (!isAuthenticated && location.pathname !== '/login') {
     return <Navigate to="/login" />;
   }
 
+  // Function to add a terminal
   const addTerminal = () => {
     setTerminals((prevTerminals) => [
       ...prevTerminals,
@@ -58,10 +63,12 @@ const AppContent = () => {
     setNextTerminalId(nextTerminalId + 1);
   };
 
+  // Function to close a terminal
   const closeTerminal = (id) => {
     setTerminals((prevTerminals) => prevTerminals.filter((terminal) => terminal.id !== id));
   };
 
+  // Minimize a terminal
   const minimizeTerminal = (id) => {
     setTerminals((prevTerminals) =>
       prevTerminals.map((terminal) =>
@@ -70,6 +77,7 @@ const AppContent = () => {
     );
   };
 
+  // Restore a terminal from minimized state
   const restoreTerminal = (id) => {
     setTerminals((prevTerminals) =>
       prevTerminals.map((terminal) =>
@@ -78,6 +86,7 @@ const AppContent = () => {
     );
   };
 
+  // Toggle fullscreen mode for a terminal
   const toggleFullscreen = (id) => {
     setTerminals((prevTerminals) =>
       prevTerminals.map((terminal) =>
@@ -86,6 +95,7 @@ const AppContent = () => {
     );
   };
 
+  // Update terminal state
   const updateTerminalState = (id, command, output) => {
     setTerminals((prevTerminals) =>
       prevTerminals.map((terminal) =>
@@ -94,28 +104,35 @@ const AppContent = () => {
     );
   };
 
+  // Open system info panel
   const openSystemInfo = () => {
     setSystemInfo({ ...systemInfo, isOpen: true });
   };
 
+  // Close system info panel
   const closeSystemInfo = () => {
     setSystemInfo({ isOpen: false, isFullscreen: false, isMinimized: false });
   };
 
+  // Minimize system info
   const minimizeSystemInfo = () => {
     setSystemInfo({ ...systemInfo, isMinimized: true });
   };
 
+  // Restore minimized system info
   const restoreSystemInfo = () => {
     setSystemInfo({ ...systemInfo, isMinimized: false });
   };
 
+  // Toggle fullscreen for system info
   const toggleSystemInfoFullscreen = () => {
     setSystemInfo({ ...systemInfo, isFullscreen: !systemInfo.isFullscreen });
   };
 
+  // Filter minimized terminals
   const minimizedTerminals = terminals.filter((t) => t.isMinimized);
 
+  // Toggle Dropbox visibility
   const toggleDropboxVisibility = () => {
     setDropboxVisible((prevVisible) => !prevVisible);
   };
@@ -126,9 +143,11 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<LoginPage />} />
+        {/* Protected routes that require authentication */}
         <Route path="/file-system" element={<ProtectedRoute element={<FileSystem />} />} />
         <Route path="/task-manager" element={<ProtectedRoute element={<TaskManager />} />} />
       </Routes>
+      {/* Render Navbar and other components only when authenticated */}
       {isAuthenticated && location.pathname !== '/login' && (
         <>
           <Navbar
@@ -138,6 +157,7 @@ const AppContent = () => {
             minimizedTerminals={minimizedTerminals}
             restoreTerminal={restoreTerminal}
           />
+          {/* Render terminals */}
           {terminals.map((terminal) =>
             !terminal.isMinimized ? (
               <div
@@ -156,6 +176,7 @@ const AppContent = () => {
               </div>
             ) : null
           )}
+          {/* Render system info if it's open */}
           {!systemInfo.isMinimized && systemInfo.isOpen && (
             <div className={systemInfo.isFullscreen ? 'system-info-overlay fullscreen' : 'system-info-overlay'}>
               <SystemInfo
@@ -166,6 +187,7 @@ const AppContent = () => {
               />
             </div>
           )}
+          {/* Render Dropbox if visible */}
           {isDropboxVisible && location.pathname !== '/task-manager' && <Dropbox />}
         </>
       )}
@@ -173,6 +195,7 @@ const AppContent = () => {
   );
 };
 
+// Navbar component for navigating between sections
 const Navbar = ({ onTerminalClick, onSystemInfoClick, onDropboxClick, minimizedTerminals, restoreTerminal }) => {
   const navigate = useNavigate();
 
@@ -193,6 +216,7 @@ const Navbar = ({ onTerminalClick, onSystemInfoClick, onDropboxClick, minimizedT
       <button id="btn" onClick={onDropboxClick}>
         <img src={DropboxImg} alt="Toggle Dropbox" />
       </button>
+      {/* Render minimized terminals */}
       {minimizedTerminals.length > 0 && <hr className="dock-divider" />}
       {minimizedTerminals.map((terminal) => (
         <button key={terminal.id} id="btn" onClick={() => restoreTerminal(terminal.id)}>
@@ -203,6 +227,7 @@ const Navbar = ({ onTerminalClick, onSystemInfoClick, onDropboxClick, minimizedT
   );
 };
 
+// Main App component with routing and context
 const App = () => (
   <ThemeProvider theme={theme}>
     <Router>
