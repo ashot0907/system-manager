@@ -294,30 +294,43 @@ app.get('/api/password', (req, res) => {
   res.json({ password: process.env.ADMIN_PASSWORD });
 });
 
+const loadPassword = async () => {
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
+  };
+
+  loadPassword();
+
+
 // Verify password
-app.post('/api/verify-password', (req, res) => {
+app.post('/api/verify-password', async (req, res) => {
   const { password } = req.body;
-  if (password === process.env.ADMIN_PASSWORD) {
-    res.status(200).json({ success: true });
+
+  // Check if the entered password matches the stored hashed password
+  const isMatch = await bcrypt.compare(password, hashedAdminPassword);
+  if (isMatch) {
+    res.json({ success: true });
   } else {
     res.status(401).json({ success: false, message: 'Incorrect password' });
   }
 });
 
 // Update password (Note: Updating .env programmatically is not typical and should be done cautiously)
-app.post('/api/update-password', (req, res) => {
-  const { newPassword } = req.body;
+app.post('/api/update-password', async (req, res) => {
+    const { newPassword } = req.body;
   
-  const envData = fs.readFileSync(envPath, 'utf8');
-  const updatedEnvData = envData.replace(/ADMIN_PASSWORD=.*/, `ADMIN_PASSWORD=${newPassword}`);
+    // Hash the new password
+    hashedAdminPassword = await bcrypt.hash(newPassword, 10);
   
-  fs.writeFileSync(envPath, updatedEnvData, 'utf8');
+    // Update the password in the .env file
+    const envData = fs.readFileSync(envPath, 'utf8');
+    const updatedEnvData = envData.replace(/ADMIN_PASSWORD=.*/, `ADMIN_PASSWORD=${newPassword}`);
+    
+    fs.writeFileSync(envPath, updatedEnvData, 'utf8');
   
-  // Reload the environment variables
-  require('dotenv').config();
-  
-  res.status(200).json({ success: true, message: 'Password updated successfully' });
-});
+    // Respond with success message
+    res.json({ success: true, message: 'Password updated successfully' });
+  });
 
 const upload = multer({ dest: 'uploads/' });
 

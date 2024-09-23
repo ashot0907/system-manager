@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { Button, TextField, Typography, Container, Paper, Box } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import loginLogo from './assets/loginlogo.png';
 
 const darkTheme = createTheme({
   palette: {
@@ -39,6 +40,9 @@ const LoginPage = () => {
         <Paper elevation={6}>
           <Box p={3}>
             <form onSubmit={handleSubmit}>
+            <Box display="flex" justifyContent="center" mb={0}>
+                <img src={loginLogo} alt="Login Logo" style={{ width: '300px', height: 'auto' }} />
+              </Box>
               <TextField
                 label="Password"
                 type="password"
