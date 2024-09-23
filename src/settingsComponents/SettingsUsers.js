@@ -14,17 +14,17 @@ const SettingsUsers = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: currentPassword }),
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        setPasswordVerified(true);
-        setErrorMessage('');
-      } else {
-        setErrorMessage(data.message);
-        setPasswordVerified(false);
-      }
-    })
-    .catch(error => console.error('Error verifying password:', error));
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          setPasswordVerified(true);
+          setErrorMessage('');
+        } else {
+          setErrorMessage(data.message);
+          setPasswordVerified(false);
+        }
+      })
+      .catch(error => console.error('Error verifying password:', error));
   };
 
   const handleUpdatePassword = () => {
@@ -34,19 +34,19 @@ const SettingsUsers = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newPassword }),
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          setSuccessMessage(data.message);
-          setErrorMessage('');
-          setPasswordVerified(false);
-          setCurrentPassword('');
-          setNewPassword('');
-        } else {
-          setErrorMessage(data.message);
-        }
-      })
-      .catch(error => console.error('Error updating password:', error));
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            setSuccessMessage('Verification passed successfully');
+            setErrorMessage('');
+            setPasswordVerified(false);
+            setCurrentPassword('');
+            setNewPassword('');
+          } else {
+            setErrorMessage(data.message);
+          }
+        })
+        .catch(error => console.error('Error updating password:', error));
     }
   };
 
@@ -74,6 +74,7 @@ const SettingsUsers = () => {
           />
           <button onClick={handleUpdatePassword}>Change Password</button>
           {successMessage && <p className="success">{successMessage}</p>}
+          {errorMessage && <p className="error">{errorMessage}</p>}
         </div>
       )}
     </div>
