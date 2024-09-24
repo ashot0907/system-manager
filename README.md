@@ -1,4 +1,16 @@
-# Getting Started with Create React App
+# Getting Started with WebOS System Manager
+How to run:
+1. Download the project
+2. cd backend
+3. sudo node server.js
+4. sudo node Express.js
+5. cd ../ 
+6. npm start
+(dont forget to install node modules in backend too)
+
+
+
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
