@@ -15,5 +15,5 @@ node express.js &
 cd ..
 
 # Start the application on PORT 222
-PORT=222 npm start
+PORT=222 npm start &
 '
