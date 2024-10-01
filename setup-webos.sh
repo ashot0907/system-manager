@@ -17,9 +17,9 @@ fi
 if ! grep -q "alias webos-start=" ~/.bashrc; then
     # Add the alias to .bashrc
     echo "alias webos-start='bash $SCRIPT_PATH'" >> ~/.bashrc
-    echo "Alias 'webos start' has been added to .bashrc."
+    echo "Alias 'webos-start' has been added to .bashrc."
 else
-    echo "Alias 'webos start' already exists in .bashrc."
+    echo "Alias 'webos-start' already exists in .bashrc."
 fi
 
 # Reload .bashrc to apply changes (if the script is sourced)
@@ -30,6 +30,8 @@ else
     echo "Please reload your terminal or run 'source ~/.bashrc' manually."
 fi
 
-echo "You can now use 'webos start' to execute your script."
+echo "You can now use 'webos-start' to execute your script."
 
 EOF
+
+bash
