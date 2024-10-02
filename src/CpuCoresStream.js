@@ -39,12 +39,20 @@ const CpuCoresStream = () => {
   const [processes, setProcesses] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/system')
-      .then(response => {
-        setCpuCores(response.data.cpuCores || []);
-        setProcesses(response.data.processes || []);
-      })
-      .catch(error => console.error('Error fetching data:', error));
+    const fetchData = () => {
+      axios.get('http://localhost:5000/api/system')
+        .then(response => {
+          setCpuCores(response.data.cpuCores || []);
+          setProcesses(response.data.processes || []);
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    };
+
+    // Fetch data immediately and then set up interval to fetch every 5 seconds
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+
+    return () => clearInterval(interval); // Clean up the interval on unmount
   }, []);
 
   const getChartData = () => {

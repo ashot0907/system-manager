@@ -23,15 +23,20 @@ const SystemCharts = () => {
   const chartRefs = useRef([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/system')
-      .then(response => {
-        setData(response.data);
-      })
-      .catch(error => console.error(error));
-  }, []);
+    const fetchData = () => {
+      axios.get('http://localhost:5000/api/system')
+        .then(response => {
+          setData(response.data);
+        })
+        .catch(error => console.error(error));
+    };
 
-  useEffect(() => {
+    // Fetch data immediately and set up an interval to fetch every 5 seconds
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+
     return () => {
+      clearInterval(interval); // Cleanup interval on component unmount
       chartRefs.current.forEach(chart => chart && chart.destroy());
     };
   }, []);

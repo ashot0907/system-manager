@@ -7,9 +7,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Border } from 'victory';
-import { color } from 'chart.js/helpers';
-import { BorderColor } from '@mui/icons-material';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -20,14 +17,22 @@ const TotalUsageDonuts = () => {
   const [memory, setMemory] = useState({ total: 0, used: 0, free: 0 });
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/system')
-      .then(response => {
-        setTotalCpuUsage(response.data.totalCpuUsage);
-        setTotalGpuUsage(response.data.totalGpuUsage);
-        setTotalMemUsage(response.data.totalMemUsage);
-        setMemory(response.data.memory);
-      })
-      .catch(error => console.error(error));
+    const fetchData = () => {
+      axios.get('http://localhost:5000/api/system')
+        .then(response => {
+          setTotalCpuUsage(response.data.totalCpuUsage);
+          setTotalGpuUsage(response.data.totalGpuUsage);
+          setTotalMemUsage(response.data.totalMemUsage);
+          setMemory(response.data.memory);
+        })
+        .catch(error => console.error(error));
+    };
+
+    // Fetch data immediately and then every 5 seconds
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+
+    return () => clearInterval(interval); // Cleanup on component unmount
   }, []);
 
   if (!memory || memory.total === 0) {
@@ -38,8 +43,8 @@ const TotalUsageDonuts = () => {
     labels: ['Used CPU %', 'Free CPU %'],
     datasets: [{
       data: [totalCpuUsage, 100 - totalCpuUsage],
-       backgroundColor: ['rgb(205, 205, 205)', 'rgb(102, 107, 112)'],
-       borderColor: "rgba(249, 105, 14)"
+      backgroundColor: ['rgb(205, 205, 205)', 'rgb(102, 107, 112)'],
+      borderColor: "rgba(249, 105, 14)"
     }],
   };
 

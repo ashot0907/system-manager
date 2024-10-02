@@ -6,30 +6,38 @@ const UsedPorts = () => {
     const [portsData, setPortsData] = useState([]);
 
     useEffect(() => {
-        fetchPortsData();
-    }, []);
+        const fetchPortsData = () => {
+            axios.get('http://localhost:5000/api/used-ports')
+                .then(response => setPortsData(response.data))
+                .catch(error => {
+                    console.error('Error fetching ports data:', error);
+                    console.error('Error response:', error.response);
+                    console.error('Error request:', error.request);
+                });
+        };
 
-    const fetchPortsData = () => {
-        axios.get('http://localhost:5000/api/used-ports')
-            .then(response => setPortsData(response.data))
-            .catch(error => {
-                console.error('Error fetching ports data:', error);
-                console.error('Error response:', error.response);
-                console.error('Error request:', error.request);
-            });
-    };
+        // Fetch data immediately and then every 5 seconds
+        fetchPortsData();
+        const interval = setInterval(fetchPortsData, 5000);
+
+        // Cleanup the interval on component unmount
+        return () => clearInterval(interval);
+    }, []);
 
     const stopProcess = (pid) => {
         axios.post('http://localhost:5000/api/stop-process', { pid })
             .then(response => {
                 alert(`Process with PID ${pid} stopped successfully`);
-                fetchPortsData(); // Refresh data after stopping process
+                // Fetch data again after stopping a process
+                axios.get('http://localhost:5000/api/used-ports')
+                    .then(response => setPortsData(response.data))
+                    .catch(error => console.error('Error fetching ports data:', error));
             })
             .catch(error => alert(`Failed to stop process with PID ${pid}`));
     };
 
     return (
-        <TableContainer component={Paper} style={{ backgroundColor: '#333', width:'100%'}}>
+        <TableContainer component={Paper} style={{ backgroundColor: '#333', width:'100%' }}>
             <Table aria-label="used ports table">
                 <TableHead>
                     <TableRow>

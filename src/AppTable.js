@@ -24,17 +24,25 @@ const AppTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(15);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/system')
-      .then(response => {
-        const sortedTasks = response.data.processes
-          .filter(task => task.cpu > 0 || task.gpu > 0 || task.mem > 0)
-          .sort((a, b) => b.cpu - a.cpu);
-        setTasks(sortedTasks);
-        setTotalCpuUsage(response.data.totalCpuUsage);
-        setTotalGpuUsage(response.data.totalGpuUsage);
-        setTotalMemUsage(response.data.totalMemUsage);
-      })
-      .catch(error => console.error(error));
+    const fetchData = () => {
+      axios.get('http://localhost:5000/api/system')
+        .then(response => {
+          const sortedTasks = response.data.processes
+            .filter(task => task.cpu > 0 || task.gpu > 0 || task.mem > 0)
+            .sort((a, b) => b.cpu - a.cpu);
+          setTasks(sortedTasks);
+          setTotalCpuUsage(response.data.totalCpuUsage);
+          setTotalGpuUsage(response.data.totalGpuUsage);
+          setTotalMemUsage(response.data.totalMemUsage);
+        })
+        .catch(error => console.error(error));
+    };
+
+    // Fetch the data every 5 seconds
+    fetchData(); // Initial fetch
+    const interval = setInterval(fetchData, 5000); // Fetch every 5 seconds
+
+    return () => clearInterval(interval); // Clean up the interval on component unmount
   }, []);
 
   const handleChangePage = (event, newPage) => {
@@ -70,15 +78,6 @@ const AppTable = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[15, 30, 45]}
-        component="div"
-        count={tasks.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
     </DarkPaper>
   );
 };
