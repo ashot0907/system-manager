@@ -1,6 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { Editor } from '@monaco-editor/react';
+import { Menu, MenuItem, ThemeProvider, createTheme } from '@mui/material';
 import './FileSystem.css';
+
+// Create a dark theme with smaller font size for the menus
+const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+    },
+    components: {
+        MuiMenuItem: {
+            styleOverrides: {
+                root: {
+                    fontSize: '0.85rem', // Smaller font size
+                    padding: '6px 12px', // Smaller padding
+                },
+            },
+        },
+        MuiMenu: {
+            styleOverrides: {
+                paper: {
+                    backgroundColor: '#333', // Dark background for menu
+                    color: '#fff', // Light text
+                },
+            },
+        },
+    },
+});
 
 function FileSystem() {
     const [files, setFiles] = useState([]);
@@ -216,73 +242,88 @@ function FileSystem() {
         }
     };
 
+    const handleCloseMenu = () => {
+        setContextMenu(null);
+        setDesktopMenu(null);
+    };
+
     return (
-        <div className="desktop" onContextMenu={handleContextMenu}>
-            <div className="pwd-display" style={{ position: 'absolute', top: '10px', left: '20px' }}>{currentPath}</div>
+        <ThemeProvider theme={darkTheme}>
+            <div className="desktop" onContextMenu={handleContextMenu} onClick={handleCloseMenu}>
+                <div className="pwd-display" style={{ position: 'absolute', top: '10px', left: '20px' }}>{currentPath}</div>
 
-            {selectedFile ? (
-                <div className="editor-container">
-                    <div className="editor-header">
-                        <h2>Editing: {selectedFile.name}</h2>
-                        <div>
-                            <button className="btn-save" onClick={handleSave}>💾 Save</button>
-                            <button className="btn-close" onClick={() => setSelectedFile(null)}>❌ Close</button>
+                {selectedFile ? (
+                    <div className="editor-container">
+                        <div className="editor-header">
+                            <h2>Editing: {selectedFile.name}</h2>
+                            <div>
+                                <button className="btn-save" onClick={handleSave}>💾 Save</button>
+                                <button className="btn-close" onClick={() => setSelectedFile(null)}>❌ Close</button>
+                            </div>
                         </div>
+                        <Editor
+                            height="85vh"
+                            width="100%"
+                            language={selectedFile.name.split('.').pop()}
+                            value={fileContent}
+                            onChange={(value) => setFileContent(value)}
+                            theme="vs-dark"
+                            options={{
+                                fontSize: 14,
+                                minimap: { enabled: false },
+                                scrollBeyondLastLine: false,
+                                wordWrap: 'on',
+                            }}
+                        />
                     </div>
-                    <Editor
-                        height="85vh"
-                        width="100%"
-                        language={selectedFile.name.split('.').pop()}
-                        value={fileContent}
-                        onChange={(value) => setFileContent(value)}
-                        theme="vs-dark"
-                        options={{
-                            fontSize: 14,
-                            minimap: { enabled: false },
-                            scrollBeyondLastLine: false,
-                            wordWrap: 'on',
-                        }}
-                    />
-                </div>
-            ) : (
-                <>
-                    {currentPath !== '/' && (
-                        <div className="file-icon" onClick={handleGoBack} onMouseEnter={() => handleMouseEnter(null)} onMouseLeave={handleMouseLeave}>
-                            <img src="/imgs/gobackdir.png" alt="folder icon" />
-                            <p>..</p>
-                        </div>
-                    )}
-                    {files.map((file, index) => (
-                        <div
-                            key={index}
-                            className="file-icon"
-                            onClick={() => file.isDirectory ? handleDirectoryClick(file.path) : handleFileClick(file)}
-                            onMouseEnter={() => handleMouseEnter(file)}
-                            onMouseLeave={handleMouseLeave}
-                        >
-                            <img src={file.isDirectory ? "/imgs/folder.png" : "/imgs/file.png"} alt={file.isDirectory ? "folder icon" : "file icon"} />
-                            <p>{file.name}</p>
-                        </div>
-                    ))}
-                </>
-            )}
+                ) : (
+                    <>
+                        {currentPath !== '/' && (
+                            <div className="file-icon" onClick={handleGoBack} onMouseEnter={() => handleMouseEnter(null)} onMouseLeave={handleMouseLeave}>
+                                <img src="/imgs/gobackdir.png" alt="folder icon" />
+                                <p>..</p>
+                            </div>
+                        )}
+                        {files.map((file, index) => (
+                            <div
+                                key={index}
+                                className="file-icon"
+                                onClick={() => file.isDirectory ? handleDirectoryClick(file.path) : handleFileClick(file)}
+                                onMouseEnter={() => handleMouseEnter(file)}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                <img src={file.isDirectory ? "/imgs/folder.png" : "/imgs/file.png"} alt={file.isDirectory ? "folder icon" : "file icon"} />
+                                <p>{file.name}</p>
+                            </div>
+                        ))}
+                    </>
+                )}
 
-            {contextMenu && (
-                <div className="context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
-                    <button onClick={handleDelete}>Delete</button>
-                    <button onClick={handleRename}>Rename</button>
-                    <button onClick={handleUnzip}>Unzip</button>
-                    <button onClick={handleDownload}>Download</button>
-                </div>
-            )}
+                {/* Right-click context menu for files */}
+                <Menu
+                    open={Boolean(contextMenu)}
+                    onClose={handleCloseMenu}
+                    anchorReference="anchorPosition"
+                    anchorPosition={contextMenu ? { top: contextMenu.y, left: contextMenu.x } : undefined}
+                >
+                    <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                    <MenuItem onClick={handleRename}>Rename</MenuItem>
+                    <MenuItem onClick={handleUnzip}>Unzip</MenuItem>
+                    <MenuItem onClick={handleDownload}>Download</MenuItem>
+                </Menu>
 
-            {desktopMenu && (
-                <div className="context-menu" style={{ top: desktopMenu.y, left: desktopMenu.x }}>
-                    <button onClick={handleCreateFolder}>Create Folder</button>
-                    <button onClick={handleCreateTextFile}>Create Text Document</button>
-                </div>
-            )}
-        </div>
+                {/* Right-click desktop menu */}
+                <Menu
+                    open={Boolean(desktopMenu)}
+                    onClose={handleCloseMenu}
+                    anchorReference="anchorPosition"
+                    anchorPosition={desktopMenu ? { top: desktopMenu.y, left: desktopMenu.x } : undefined}
+                >
+                    <MenuItem onClick={handleCreateFolder}>Create Folder</MenuItem>
+                    <MenuItem onClick={handleCreateTextFile}>Create Text Document</MenuItem>
+                </Menu>
+            </div>
+        </ThemeProvider>
     );
 }
 
