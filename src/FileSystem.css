@@ -1,17 +1,15 @@
 .desktop {
     display: flex;
     flex-wrap: wrap;
-    /* justify-content: flex-start; Align to start for natural left-to-right positioning */
-    align-items: flex-start;
-    /* height: 100vh; */
+    justify-content: left;
+    align-items: start;
+    height: 100%;
+    /* background-color: #1e1e1e; */
     color: #f1f1f1;
     padding: 20px;
     position: relative;
-    overflow-y: auto;
-    height: 100%;
-    width: 100%;
-    gap: 30px; /* Spacing between items */
 }
+
 
 .pwd-display {
     font-size: 14px;
@@ -104,4 +102,3 @@
 .context-menu button:hover {
     background-color: #555;
 }
-

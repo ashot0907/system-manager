@@ -72,17 +72,3 @@ body {
   
 }
 
-
-
-.dropbox-container {
-  /* height: 100%; */
-  position: fixed; /* Fix position at the bottom */
-  bottom: 1px; 
-  left: 50%; /* Center horizontally */
-  transform: translateX(-50%); 
-  z-index: 1000; /* Ensure it stays on top of other content */
-  background-color: rgba(0, 0, 0, 0.8); /* Optional: add a background */
-  /* padding: 10px; Optional: add some padding */
-  width: 100%;
-  border-radius: 8px; /* Optional: rounded corners */
-}
