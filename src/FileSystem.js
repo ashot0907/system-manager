@@ -30,7 +30,7 @@ const darkTheme = createTheme({
 
 function FileSystem() {
     const [files, setFiles] = useState([]);
-    const [currentPath, setCurrentPath] = useState(localStorage.getItem('currentPath') || '/'); // Preserve path
+    const [currentPath, setCurrentPath] = useState(sessionStorage.getItem('currentPath') || '/'); // Preserve path in sessionStorage
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileContent, setFileContent] = useState('');
     const [contextMenu, setContextMenu] = useState(null);
@@ -69,7 +69,7 @@ function FileSystem() {
 
     const handleDirectoryClick = (path) => {
         setCurrentPath(path);
-        localStorage.setItem('currentPath', path); // Save path to localStorage
+        sessionStorage.setItem('currentPath', path); // Save path to sessionStorage
         setContextMenu(null);
         setDesktopMenu(null);
     };
@@ -77,7 +77,7 @@ function FileSystem() {
     const handleGoBack = () => {
         const newPath = currentPath.split('/').slice(0, -1).join('/') || '/';
         setCurrentPath(newPath);
-        localStorage.setItem('currentPath', newPath); // Save path to localStorage
+        sessionStorage.setItem('currentPath', newPath); // Save path to sessionStorage
         setContextMenu(null);
         setDesktopMenu(null);
     };

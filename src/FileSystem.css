@@ -1,9 +1,9 @@
 .desktop {
     display: flex;
     flex-wrap: wrap;
-    /* justify-content: flex-start; Align to start for natural left-to-right positioning */
-    align-items: center;
-    /* height: 100vh; */
+    justify-content: flex-start; 
+    align-items:  flex-start;
+    height: 100%;
     color: #f1f1f1;
     padding: 20px;
     position: relative;
