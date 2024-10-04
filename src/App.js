@@ -188,7 +188,9 @@ const AppContent = () => {
             </div>
           )}
           {/* Render Dropbox if visible */}
-          {isDropboxVisible && location.pathname !== '/task-manager' && <Dropbox />}
+          {isDropboxVisible && location.pathname !== '/task-manager' &&  <div className="dropbox-container">
+        <Dropbox />
+    </div>}
         </>
       )}
     </div>
