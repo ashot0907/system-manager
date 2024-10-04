@@ -6,10 +6,10 @@ sudo bash -c '
 cd backend
 
 # Start the Node server
-node server.js &
+sudo node server.js &
 
 # Start the Express server
-node express.js &
+sudo node Express.js &
 
 # Navigate back to the parent directory
 cd ..
