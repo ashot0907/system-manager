@@ -1,13 +1,14 @@
 .desktop {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    /* justify-content: flex-start; Align to start for natural left-to-right positioning */
     align-items: center;
-    height: 100vh;
-    /* background-color: #1e1e1e; */
+    /* height: 100vh; */
     color: #f1f1f1;
     padding: 20px;
     position: relative;
+    overflow-y: auto;
+    gap: 30px; /* Spacing between items */
 }
 
 .pwd-display {
