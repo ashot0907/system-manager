@@ -4,24 +4,46 @@ import './FileSystem.css';
 
 function FileSystem() {
     const [files, setFiles] = useState([]);
-    const [currentPath, setCurrentPath] = useState('/');
+    const [currentPath, setCurrentPath] = useState(localStorage.getItem('currentPath') || '/'); // Preserve path
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileContent, setFileContent] = useState('');
     const [contextMenu, setContextMenu] = useState(null);
     const [hoveredFile, setHoveredFile] = useState(null);
     const [desktopMenu, setDesktopMenu] = useState(null);
+    
+    // Establish WebSocket connection for live updates
+    useEffect(() => {
+        const ws = new WebSocket('ws://localhost:5005'); // Update with your server's WebSocket endpoint
+
+        ws.onmessage = (event) => {
+            // On receiving a message, update the files
+            const message = JSON.parse(event.data);
+            if (message.action === 'update') {
+                fetchFiles(currentPath);
+            }
+        };
+
+        return () => {
+            ws.close();
+        };
+    }, [currentPath]);
 
     useEffect(() => {
         if (!selectedFile) {
-            fetch(`http://localhost:5005/files?path=${encodeURIComponent(currentPath)}`)
-                .then(response => response.json())
-                .then(data => setFiles(data))
-                .catch(error => console.error('Error fetching files:', error));
+            fetchFiles(currentPath);
         }
     }, [currentPath, selectedFile]);
 
+    const fetchFiles = (path) => {
+        fetch(`http://localhost:5005/files?path=${encodeURIComponent(path)}`)
+            .then(response => response.json())
+            .then(data => setFiles(data))
+            .catch(error => console.error('Error fetching files:', error));
+    };
+
     const handleDirectoryClick = (path) => {
         setCurrentPath(path);
+        localStorage.setItem('currentPath', path); // Save path to localStorage
         setContextMenu(null);
         setDesktopMenu(null);
     };
@@ -29,6 +51,7 @@ function FileSystem() {
     const handleGoBack = () => {
         const newPath = currentPath.split('/').slice(0, -1).join('/') || '/';
         setCurrentPath(newPath);
+        localStorage.setItem('currentPath', newPath); // Save path to localStorage
         setContextMenu(null);
         setDesktopMenu(null);
     };
@@ -104,7 +127,7 @@ function FileSystem() {
             })
                 .then(() => {
                     setContextMenu(null);
-                    setCurrentPath(currentPath);
+                    fetchFiles(currentPath); // Refresh files
                 })
                 .catch(error => console.error('Error deleting file:', error));
         }
@@ -122,7 +145,7 @@ function FileSystem() {
             })
                 .then(() => {
                     setContextMenu(null);
-                    setCurrentPath(currentPath);
+                    fetchFiles(currentPath); // Refresh files
                 })
                 .catch(error => console.error('Error renaming file:', error));
         }
@@ -140,7 +163,7 @@ function FileSystem() {
             })
                 .then(() => {
                     setDesktopMenu(null);
-                    setCurrentPath(currentPath);
+                    fetchFiles(currentPath); // Refresh files
                 })
                 .catch(error => console.error('Error creating folder:', error));
         }
@@ -158,7 +181,7 @@ function FileSystem() {
             })
                 .then(() => {
                     setDesktopMenu(null);
-                    setCurrentPath(currentPath);
+                    fetchFiles(currentPath); // Refresh files
                 })
                 .catch(error => console.error('Error creating text file:', error));
         }
@@ -175,7 +198,7 @@ function FileSystem() {
             })
                 .then(() => {
                     setContextMenu(null);
-                    setCurrentPath(currentPath);
+                    fetchFiles(currentPath); // Refresh files
                 })
                 .catch(error => console.error('Error unzipping file:', error));
         }
