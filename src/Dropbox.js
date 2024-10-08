@@ -3,6 +3,8 @@ import axios from 'axios';
 
 const Dropbox = () => {
     const [files, setFiles] = useState([]);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadSuccess, setUploadSuccess] = useState(false); // Для отслеживания успешной загрузки
 
     const handleFileDrop = (e) => {
         e.preventDefault();
@@ -39,7 +41,25 @@ const Dropbox = () => {
             const response = await axios.post('http://localhost:5005/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    'directory-path': pwd, // Send the path to the backend
+                    'directory-path': pwd, // Отправляем путь на бэкэнд
+                },
+                onUploadProgress: (progressEvent) => {
+                    const totalLength = progressEvent.lengthComputable
+                        ? progressEvent.total
+                        : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+                    if (totalLength !== null) {
+                        const progress = Math.round((progressEvent.loaded * 100) / totalLength);
+                        setUploadProgress(progress);
+                        console.log(`Upload Progress: ${progress}%`);
+
+                        // Если прогресс достиг 100%, установить успешную загрузку
+                        if (progress === 100) {
+                            setUploadSuccess(true);
+                            setTimeout(() => {
+                                window.location.reload(); // Перезагрузка страницы через 3 секунды
+                            }, 3000);
+                        }
+                    }
                 }
             });
             console.log('Upload successful:', response.data.message);
@@ -62,17 +82,27 @@ const Dropbox = () => {
             }}
         >
             <button onClick={() => document.getElementById('fileInput').click()} style={{background:'none', color:'white'}}>
-            <p>Drop files or folders here to upload or</p>
-            <input
-                type="file"
-                multiple
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
-                id="fileInput"
-            />
-            
+                <p>Drop files or folders here to upload or</p>
+                <input
+                    type="file"
+                    multiple
+                    onChange={handleFileSelect}
+                    style={{ display: 'none' }}
+                    id="fileInput"
+                />
                 Choose Files
             </button>
+            {uploadProgress > 0 && (
+                <div style={{ marginTop: '20px', color: 'white' }}>
+                    <progress value={uploadProgress} max="100" style={{ width: '100%' }}></progress>
+                    <p>Upload Progress: {uploadProgress}%</p>
+                </div>
+            )}
+            {uploadSuccess && (
+                <div style={{ marginTop: '20px', color: 'white' }}>
+                    <p>Uploaded successfully!</p>
+                </div>
+            )}
         </div>
     );
 };
