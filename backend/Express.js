@@ -190,38 +190,38 @@ const updateVersion = () => {
   };
   
   app.post('/check-for-updates', (req, res) => {
-    exec('git fetch', (error, stdout, stderr) => {
+    // Run 'git reset --hard' and 'git pull'
+    exec('git reset --hard && git pull', (error, stdout, stderr) => {
       if (error) {
-        return res.status(500).json({ message: 'Error occurred during fetch.', error: stderr });
+        console.error(`Error: ${error.message}`);
+        return res.status(500).json({ message: 'Error checking for updates.' });
+      }
+      if (stderr) {
+        console.error(`Stderr: ${stderr}`);
+        return res.status(500).json({ message: 'Error pulling updates.' });
       }
   
-      exec('git status -uno', (statusError, statusStdout, statusStderr) => {
-        if (statusError) {
-          return res.status(500).json({ message: 'Error occurred during status check.', error: statusStderr });
-        }
-  
-        if (statusStdout.includes('Your branch is up to date')) {
-          return res.status(200).json({ message: 'No updates available.', version: getCurrentVersion() });
-        } else {
-          exec('git pull', (pullError, pullStdout, pullStderr) => {
-            if (pullError) {
-              return res.status(500).json({ message: 'Error occurred during pull.', error: pullStderr });
-            }
-  
-            const updatedVersion = updateVersion();
-            res.status(200).json({ message: 'Updates pulled and applied!', version: updatedVersion });
-          });
-        }
-      });
+      // If everything is successful, return the success message
+      const updatedVersion = stdout.match(/Already up to date|Updating to (\d+\.\d+\.\d+)/) ? 'updated' : 'Already up to date';
+      res.json({ message: updatedVersion, version: stdout });
     });
   });
   
+  
   app.post('/hard-reset', (req, res) => {
-    exec('git reset --hard', (error, stdout, stderr) => {
+    // Run 'git reset --hard' and './webos-ip-setup.sh'
+    exec('git reset --hard && ./webos-ip-setup.sh', (error, stdout, stderr) => {
       if (error) {
-        return res.status(500).json({ message: 'Error occurred during hard reset.', error: stderr });
+        console.error(`Error: ${error.message}`);
+        return res.status(500).json({ message: 'Error during hard reset.' });
       }
-      res.status(200).json({ message: 'Hard reset completed.' });
+      if (stderr) {
+        console.error(`Stderr: ${stderr}`);
+        return res.status(500).json({ message: 'Error executing webos-ip-setup.' });
+      }
+  
+      // If everything is successful, return the success message
+      res.json({ message: 'OS hard reset successful.' });
     });
   });
   
