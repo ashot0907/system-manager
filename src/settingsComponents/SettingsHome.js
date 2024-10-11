@@ -15,36 +15,36 @@ const SettingsHome = () => {
   const [version, setVersion] = useState('v3.0');
   const [loading, setLoading] = useState(false);
   const [updateMessage, setUpdateMessage] = useState('');
+  const [customBg, setCustomBg] = useState(null); // For custom background
 
   useEffect(() => {
-    // Reapply the background in case it was overridden
     const savedBackground = localStorage.getItem('selectedBackground');
     if (savedBackground) {
       document.body.style.backgroundImage = `url(${savedBackground})`;
     }
-
-    // Fetch the initial version from package.json
-    fetch('http://localhost:5005/version')
-      .then((response) => response.json())
-      .then((data) => {
-        setVersion(`v${data.version}`);
-      });
   }, []);
 
   const handleBackgroundChange = (src) => {
     document.body.style.backgroundImage = `url(${src})`;
-    // Save the selected background to localStorage
     localStorage.setItem('selectedBackground', src);
+  };
+
+  const handleCustomBackgroundChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const customBgUrl = URL.createObjectURL(file);
+      setCustomBg(customBgUrl);
+      document.body.style.backgroundImage = `url(${customBgUrl})`;
+      localStorage.setItem('selectedBackground', customBgUrl);
+    }
   };
 
   const handleCheckForUpdates = () => {
     setLoading(true);
-    setButtonText("Checking for Updates...");
-    setUpdateMessage(''); // Clear previous message
+    setButtonText('Checking for Updates...');
+    setUpdateMessage('');
 
-    fetch('http://localhost:5005/check-for-updates', {
-      method: 'POST',
-    })
+    fetch('http://localhost:5005/check-for-updates', { method: 'POST' })
       .then((response) => response.json())
       .then((data) => {
         setLoading(false);
@@ -52,12 +52,12 @@ const SettingsHome = () => {
           setVersion(`v${data.version}`);
           setButtonText("You're updated to the latest version!");
         } else {
-          setButtonText("Already up to date");
+          setButtonText('Already up to date');
         }
         setUpdateMessage(data.message);
         setTimeout(() => {
           setButtonText('Check for Updates');
-        }, 4000); // Revert the text back after 4 seconds
+        }, 4000);
       })
       .catch((error) => {
         setLoading(false);
@@ -68,16 +68,14 @@ const SettingsHome = () => {
 
   const handleHardReset = () => {
     setLoading(true);
-    setUpdateMessage(''); // Clear previous message
+    setUpdateMessage('');
 
-    fetch('http://localhost:5005/hard-reset', {
-      method: 'POST',
-    })
+    fetch('http://localhost:5005/hard-reset', { method: 'POST' })
       .then((response) => response.json())
       .then((data) => {
         setLoading(false);
         setUpdateMessage(data.message);
-        handleCheckForUpdates(); // Trigger the update check after hard reset
+        handleCheckForUpdates();
       })
       .catch((error) => {
         setLoading(false);
@@ -109,6 +107,10 @@ const SettingsHome = () => {
             </div>
           ))}
         </div>
+
+        <h3>Upload Custom Background</h3>
+        <input type="file" accept="image/*" onChange={handleCustomBackgroundChange} />
+        {customBg && <p>Custom background applied!</p>}
       </div>
     </div>
   );
