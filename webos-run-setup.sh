@@ -1,4 +1,7 @@
 #!/bin/bash
+# npm installs
+chmod +x install-webos-npm.sh
+./install-webos-npm.sh
 
 # Make webos-ip-setup.sh executable and run it
 chmod +x webos-ip-setup.sh
