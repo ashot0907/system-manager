@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# Navigate to the 'src' directory first
-cd src || { echo "Directory 'src' not found"; exit 1; }
+# Перейти сначала в каталог 'src'
+cd src || { echo "Каталог 'src' не найден"; exit 1; }
 
-# Get the system's IP address (adjust the interface if necessary)
+# Получить IP-адрес системы (скорректируй интерфейс, если нужно)
 IP_ADDRESS=$(ifconfig en0 | grep 'inet ' | awk '{print $2}')
 
-# Specify the directory where the files are located (you can change this to a specific directory)
+# Задать каталог, где находятся файлы (можешь изменить это на конкретный каталог)
 DIRECTORY="."
 
-# Find and replace 'localhost' with the system IP in all files (force LC_ALL to handle encoding issues)
-find "$DIRECTORY" -type f -exec bash -c 'LC_ALL=C sed -i.bak "s/localhost/$0/g" "$1"' "$IP_ADDRESS" {} \;
+# Найти и заменить 'localhost' на IP-адрес системы во всех файлах
+find "$DIRECTORY" -type f -exec bash -c 'IP_ADDRESS="$1"; sed -i.bak "s/localhost/$IP_ADDRESS/g" "$2"' _ "$IP_ADDRESS" {} \;
 
-# Remove .bak files created by sed (backup files)
+# Удалить файлы с расширением .bak, созданные командой sed (резервные копии)
 find "$DIRECTORY" -name "*.bak" -type f -delete
 
-echo "All instances of 'localhost' have been replaced with $IP_ADDRESS in directory $DIRECTORY and its subdirectories."
+echo "Все экземпляры 'localhost' были заменены на $IP_ADDRESS в каталоге $DIRECTORY и его подкаталогах."
