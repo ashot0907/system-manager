@@ -9,10 +9,16 @@ const fs = require('fs');
 const systeminformation = require('systeminformation');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
+const pty = require('node-pty');
+const expressWs = require('express-ws');
+
+
 
 
 const app = express();
 const port = 5000;
+expressWs(app);  // Добавляем поддержку WebSocket
+
 
 let hashedAdminPassword;
 
@@ -179,41 +185,34 @@ app.get('/api/system-stats', async (req, res) => {
     }
 });
 
-const { spawn } = require('child_process');
-let currentDirectory = process.cwd();
+// Статические файлы (например, React приложение)
+app.use(express.static(path.join(__dirname, 'build')));
 
-app.post('/api/execute', (req, res) => {
-    let { command } = req.body;
-
-    // Handle 'cd' command
-    if (command.startsWith('cd ')) {
-        const newDir = command.slice(3).trim();
-        try {
-            process.chdir(newDir); 
-            currentDirectory = process.cwd();
-            return res.json(`Changed directory to ${currentDirectory}`);
-        } catch (error) {
-            return res.json(`cd: ${newDir}: No such file or directory`);
-        }
-    }
-
-    // Run the command using spawn
-    const processCommand = spawn(command, { cwd: currentDirectory, shell: true });
-
-    processCommand.stdout.on('data', (data) => {
-        res.write(data.toString()); // Ensure that you're sending plain text
+// WebSocket для обработки терминальных команд
+app.ws('/ws-terminal', (ws, req) => {
+    // Создаём терминал (bash)
+    const shell = pty.spawn('bash', [], {
+        name: 'xterm-color',
+        cols: 80,
+        rows: 30,
+        cwd: process.env.HOME,
+        env: process.env,
     });
 
-    processCommand.stderr.on('data', (data) => {
-        res.write(data.toString()); // Send errors as plain text
+    // Передача данных из терминала в клиент
+    shell.on('data', (data) => {
+        ws.send(data);
     });
 
-    processCommand.on('close', () => {
-        res.end(); // End the response when the process finishes without sending any extra messages
+    // Получение команды от клиента и выполнение её в терминале
+    ws.on('message', (msg) => {
+        shell.write(msg);
+    });
+
+    ws.on('close', () => {
+        shell.kill();
     });
 });
-
-
 
 const SECRET_KEY = process.env.SECRET_KEY || 'Web';
 
