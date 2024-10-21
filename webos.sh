@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run all commands with superuser privileges
-sudo bash -c '
+bash -c '
 # Navigate to the backend directory
 cd backend
 
