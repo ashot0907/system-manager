@@ -201,7 +201,7 @@ app.ws('/ws-terminal', (ws, req) => {
     });
 
     // Отключаем bracketed paste mode
-    shell.write('printf \'\\e[?2004l\'\n');
+    
 
     // Передача данных из терминала в клиент с очисткой управляющих последовательностей
     shell.on('data', (data) => {
