@@ -186,22 +186,27 @@ app.get('/api/system-stats', async (req, res) => {
 });
 
 // Статические файлы (например, React приложение)
+// Статические файлы (например, React приложение)
 app.use(express.static(path.join(__dirname, 'build')));
 
 // WebSocket для обработки терминальных команд
 app.ws('/ws-terminal', (ws, req) => {
     // Создаём терминал (bash)
-    const shell = pty.spawn('bash', [], {
-        name: 'xterm-color',
+    const shell = pty.spawn('bash', ['--noediting', '--norc', '--noprofile'], {
+        name: 'xterm',
         cols: 80,
         rows: 30,
         cwd: process.env.HOME,
-        env: process.env,
+        env: Object.assign({}, process.env, { TERM: 'xterm' }),
     });
 
-    // Передача данных из терминала в клиент
+    // Отключаем bracketed paste mode
+    shell.write('printf \'\\e[?2004l\'\n');
+
+    // Передача данных из терминала в клиент с очисткой управляющих последовательностей
     shell.on('data', (data) => {
-        ws.send(data);
+        const cleanedData = data.replace(/\x1B\[[0-9;]*[A-Za-z]/g, ''); // Убираем управляющие последовательности
+        ws.send(cleanedData);
     });
 
     // Получение команды от клиента и выполнение её в терминале
@@ -209,10 +214,12 @@ app.ws('/ws-terminal', (ws, req) => {
         shell.write(msg);
     });
 
+    // Закрытие WebSocket и завершение процесса терминала
     ws.on('close', () => {
         shell.kill();
     });
 });
+
 
 const SECRET_KEY = process.env.SECRET_KEY || 'Web';
 
